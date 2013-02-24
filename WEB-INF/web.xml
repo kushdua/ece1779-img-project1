@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0"
+  metadata-complete="true">
+
+  <display-name>Tomcat Manager Application</display-name>
+  <description>
+    A scriptable management web application for the Tomcat Web Server;
+    Manager lets you view, load/unload/etc particular web applications.
+  </description>
+
+    <display-name>CSC309 Examples</display-name>
+    <description>
+      CSC309 Examples.
+    </description>
+
+    <!-- Define servlets that are included in the example application -->
+
+
+  	<servlet>
+    	<servlet-name>EC2Initialization</servlet-name>
+    	<servlet-class>ece1779.ec2.Initialization</servlet-class>
+  		<load-on-startup>3</load-on-startup>
+		
+		<!-- Replace with AWS key for your account -->
+		<init-param>
+			<param-name>AWSaccessKey</param-name>
+			<param-value>AKIAI7C426NYG5B3EAZQ</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>AWSsecretKey</param-name>
+			<param-value>W0uTsx4JiqbI6QVkrW7DdDnCaEbcTmrsnvw7C6RM</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>dbDriver</param-name>
+			<param-value>com.mysql.jdbc.Driver</param-value>
+		</init-param>
+		
+		<!-- replace the info bellow with the details for your DB -->
+		<init-param>
+			<param-name>dbURL</param-name>
+			<param-value>jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779</param-value>
+		</init-param>
+	
+		<init-param>
+			<param-name>dbUser</param-name>
+			<param-value>ece1779</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>dbPassword</param-name>
+			<param-value>Sp2012</param-value>
+		</init-param>
+  	</servlet>
+
+    <servlet>
+    	<servlet-name>JSPInitialization</servlet-name>
+    	<servlet-class>ece1779.jsp.Initialization</servlet-class>
+  		<load-on-startup>1</load-on-startup>
+  	</servlet>
+  	
+  	<servlet>
+    	<servlet-name>JDBCInitialization</servlet-name>
+    	<servlet-class>ece1779.jdbc.Initialization</servlet-class>
+  		<load-on-startup>2</load-on-startup>
+  	</servlet>
+
+
+    <servlet>
+        <servlet-name>SampleServletName3</servlet-name>
+        <servlet-class>ece1779.servlets.HelloWorld</servlet-class>
+    </servlet> 
+
+    <servlet>
+        <servlet-name>Form</servlet-name>
+        <servlet-class>ece1779.servlets.Form</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PrintEnv</servlet-name>
+        <servlet-class>ece1779.servlets.PrintEnv</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CookieExample</servlet-name>
+        <servlet-class>ece1779.servlets.CookieExample</servlet-class>
+    </servlet>
+   <servlet>
+        <servlet-name>CookieLogout</servlet-name>
+        <servlet-class>ece1779.servlets.CookieLogout</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SessionExample</servlet-name>
+        <servlet-class>ece1779.servlets.SessionExample</servlet-class>
+    </servlet>
+   <servlet>
+        <servlet-name>SessionLogout</servlet-name>
+        <servlet-class>ece1779.servlets.SessionLogout</servlet-class>
+    </servlet>
+	<servlet>
+    	<servlet-name>ServletContextExample</servlet-name>
+    	<servlet-class>ece1779.servlets.ServletContextExample</servlet-class>
+  	</servlet>
+	<servlet>
+    	<servlet-name>TransactionExample</servlet-name>
+    	<servlet-class>ece1779.jdbc.Transaction</servlet-class>
+  	</servlet>
+
+	<servlet>
+    	<servlet-name>FileUpload</servlet-name>
+    	<servlet-class>ece1779.ec2.FileUpload</servlet-class>
+  	</servlet>
+
+
+	<servlet>
+    	<servlet-name>StartInstance</servlet-name>
+    	<servlet-class>ece1779.ec2.StartInstance</servlet-class>
+  	</servlet>
+
+
+	<servlet>
+    	<servlet-name>InstanceMetrics</servlet-name>
+    	<servlet-class>ece1779.ec2.InstanceMetrics</servlet-class>
+  	</servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>SampleServletName3</servlet-name>
+        <url-pattern>/servlet/HelloWorld</url-pattern>
+    </servlet-mapping>
+    
+    
+
+   <servlet-mapping>
+        <servlet-name>Form</servlet-name>
+        <url-pattern>/servlet/Form</url-pattern>
+    </servlet-mapping>
+   <servlet-mapping>
+        <servlet-name>PrintEnv</servlet-name>
+        <url-pattern>/servlet/PrintEnv</url-pattern>
+    </servlet-mapping>
+   <servlet-mapping>
+        <servlet-name>CookieExample</servlet-name>
+        <url-pattern>/servlet/CookieExample</url-pattern>
+    </servlet-mapping>
+   <servlet-mapping>
+        <servlet-name>CookieLogout</servlet-name>
+        <url-pattern>/servlet/CookieLogout</url-pattern>
+    </servlet-mapping>
+   <servlet-mapping>
+        <servlet-name>SessionExample</servlet-name>
+        <url-pattern>/servlet/SessionExample</url-pattern>
+    </servlet-mapping>
+   <servlet-mapping>
+        <servlet-name>SessionLogout</servlet-name>
+        <url-pattern>/servlet/SessionLogout</url-pattern>
+    </servlet-mapping>
+  
+   <servlet-mapping>
+        <servlet-name>ServletContextExample</servlet-name>
+        <url-pattern>/servlet/ServletContextExample</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>TransactionExample</servlet-name>
+        <url-pattern>/servlet/Transaction</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>FileUpload</servlet-name>
+        <url-pattern>/servlet/FileUpload</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>StartInstance</servlet-name>
+        <url-pattern>/servlet/StartInstance</url-pattern>
+    </servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>InstanceMetrics</servlet-name>
+        <url-pattern>/servlet/InstanceMetrics</url-pattern>
+    </servlet-mapping>
+
+</web-app>
