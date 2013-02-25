@@ -46,21 +46,21 @@
 		<!-- replace the info bellow with the details for your DB -->
 		<init-param>
 			<param-name>dbURL</param-name>
-			<param-value>jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779</param-value>
+			<param-value>jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779group1</param-value>
 		</init-param>
 	
 		<init-param>
 			<param-name>dbUser</param-name>
-			<param-value>ece1779</param-value>
+			<param-value>ece1779group1</param-value>
 		</init-param>
 		
 		<init-param>
 			<param-name>dbPassword</param-name>
-			<param-value>Sp2012</param-value>
+			<param-value>6075186915</param-value>
 		</init-param>
   	</servlet>
 
-    <servlet>
+    <!-- <servlet>
     	<servlet-name>JSPInitialization</servlet-name>
     	<servlet-class>ece1779.jsp.Initialization</servlet-class>
   		<load-on-startup>1</load-on-startup>
@@ -71,7 +71,7 @@
     	<servlet-class>ece1779.jdbc.Initialization</servlet-class>
   		<load-on-startup>2</load-on-startup>
   	</servlet>
-
+    -->
 
     <servlet>
         <servlet-name>SampleServletName3</servlet-name>
@@ -185,4 +185,33 @@
         <url-pattern>/servlet/InstanceMetrics</url-pattern>
     </servlet-mapping>
 
+    <!-- Specify what is protected and who is allowed access. -->
+<!--    <security-role>
+      <description>ECE1779 Image Project 1 Manager UI access</description>
+      <role-name>ece1779_img_manager</role-name>
+    </security-role>
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>Cloud Manager JSP pages</web-resource-name>
+        <url-pattern>/site/manager.jsp</url-pattern>
+      </web-resource-collection>
+      <auth-constraint>
+        <role-name>ece1779_img_manager</role-name>
+      </auth-constraint>
+    </security-constraint>
+-->
+    <!-- 
+      Set up the pages to be displayed for login and error. 
+      All accesses to pages in the webapp are redirected here.
+    -->
+<!--
+    <login-config>
+      <auth-method>FORM</auth-method>
+      <form-login-config>
+      <form-login-page>/site/manager_login.jsp</form-login-page>
+      <form-error-page>/site/manager_error.jsp</form-error-page>
+      </form-login-config>
+    </login-config>
+-->
 </web-app>

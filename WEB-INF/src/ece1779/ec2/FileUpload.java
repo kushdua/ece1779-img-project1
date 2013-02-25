@@ -157,7 +157,7 @@ public class FileUpload extends HttpServlet {
 
     	AmazonS3 s3 = new AmazonS3Client(awsCredentials);
         
-        String bucketName = "uoftece1779winter2013";
+        String bucketName = "ece1779-group1";
  
 
 
