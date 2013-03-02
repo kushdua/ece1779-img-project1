@@ -29,7 +29,7 @@
 <div class="container">
     <h1>Upload an image</h1>
     <div class="container">
-		<form action="/img_project1/servlet/FileUpload"  enctype="multipart/form-data" method="post">
+		<form action="/ece1779-img-project1/servlet/FileUpload"  enctype="multipart/form-data" method="post">
 		User ID: <input class="span4" type="text" name="userID" placeholder="User ID"><br />
 		Images to upload: <input class="span10" type="file" name="theFile" placeholder="Image File to Upload" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/tiff"><br />
 		

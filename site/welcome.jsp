@@ -25,10 +25,10 @@
 
 <div class="container">
 
-  <form class="form-welcome">
+  <form class="form-welcome" action="/ece1779-img-project1/servlet/Login" method="post">
     <h2 class="form-welcome-heading">Please sign in</h2>
-    <input type="text" class="input-block-level" placeholder="Email address">
-    <input type="password" class="input-block-level" placeholder="Password">
+    <input type="text" name="userNameText" class="input-block-level" placeholder="Email address">
+    <input type="password" name="passText" class="input-block-level" placeholder="Password">
     <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label>

@@ -44,11 +44,11 @@
 				    	</tr>
 						<tr>
 							<td>Worker 1</td>
-							<td>0</td>
+							<td>0 <!-- retrieve value from metrics gathering here --></td>
 						</tr>
 						<tr>
 							<td>Worker 2</td>
-							<td>0</td>
+							<td>0 <!-- retrieve value from metrics gathering here --></td>
 						</tr>
 				    </table>
 				</div>
@@ -63,7 +63,7 @@
 			 <div id="collapseManualSet" class="accordion-body collapse">
 				<div class="accordion-inner">
 					<form class="form-welcome">
-						<input type="text" class="input-block-level" value="2">
+						<input type="text" name="manualPoolSizeValue" class="input-block-level" value="2">
 					  <button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>
@@ -78,10 +78,10 @@
 			 <div id="collapseAutoScale" class="accordion-body collapse">
 				<div class="accordion-inner">
 					<form class="form-welcome">
-						<h2>CPU threshold for growing worker pool: </h2><input type="text" class="input-block-level" value="2">
-						<h3>CPU threshold for shrinking worker pool: </h2><input type="text" class="input-block-level" value="2">
-						<h3>Ratio by which to expand worker pool (2 = doubles): </h2><input type="text" class="input-block-level" value="2">
-						<h3>Ratio by which to shrink worker pool (4 = 75% off): </h2><input type="text" class="input-block-level" value="2">
+						<h2>CPU threshold for growing worker pool: </h2><input type="text" name="cpuThresholdGrowValue" class="input-block-level" value="2">
+						<h3>CPU threshold for shrinking worker pool: </h2><input type="text" name="cpuThresholdShrinkValue" class="input-block-level" value="2">
+						<h3>Ratio by which to expand worker pool (2 = doubles): </h2><input type="text" name="ratioExpandPoolValue" class="input-block-level" value="2">
+						<h3>Ratio by which to shrink worker pool (4 = 75% off): </h2><input type="text" name="ratioShrinkPoolValue" class="input-block-level" value="2">
 					  	<button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>
