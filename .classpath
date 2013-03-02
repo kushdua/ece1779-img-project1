@@ -26,5 +26,19 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/stax-api-1.0.1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/servlet-api.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/commons-dbcp.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/jasper.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/jasper-el.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/jsp-api.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/catalina.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/catalina-ant.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/catalina-ha.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/catalina-tribes.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/annotations-api.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/commons-pool.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/tomcat-coyote.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/tomcat-i18n-es.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/tomcat-i18n-fr.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/tomcat-i18n-ja.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/share_tomcat6/tomcat-juli.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
