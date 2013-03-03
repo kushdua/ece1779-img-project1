@@ -14,12 +14,10 @@
     Manager lets you view, load/unload/etc particular web applications.
   </description>
 
-    <display-name>CSC309 Examples</display-name>
-    <description>
-      CSC309 Examples.
-    </description>
+    <display-name>ECE1779 AWS Image Project</display-name>
+    <description>ECE1779 AWS Image Project</description>
 
-    <!-- Define servlets that are included in the example application -->
+    <!--Define servlets used in class examples and ECE1779 AWS Image Project-->
 
 
   	<servlet>
@@ -60,7 +58,7 @@
 		</init-param>
   	</servlet>
 
-    <!-- <servlet>
+    <servlet>
     	<servlet-name>JSPInitialization</servlet-name>
     	<servlet-class>ece1779.jsp.Initialization</servlet-class>
   		<load-on-startup>1</load-on-startup>
@@ -71,7 +69,6 @@
     	<servlet-class>ece1779.jdbc.Initialization</servlet-class>
   		<load-on-startup>2</load-on-startup>
   	</servlet>
-    -->
 
     <servlet>
         <servlet-name>SampleServletName3</servlet-name>
