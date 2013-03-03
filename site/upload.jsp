@@ -18,9 +18,9 @@
 	<div class="navbar-inner">
 		<a class="brand" href="#">ECE1779 AWS Project</a>
 		<ul class="nav">
-			<li><a href="welcome.php">Home</a></li>
-			<li><a href="upload.php">Upload</a></li>
-			<li><a href="view.php">View Gallery</a></li>
+			<li><a href="welcome.jsp">Home</a></li>
+			<li><a href="upload.jsp">Upload</a></li>
+			<li><a href="view.jsp">View Gallery</a></li>
 			<li><a href="#">Logout</a></li>
 		</ul>
 	</div>
@@ -33,8 +33,9 @@
 		User ID: <input class="span4" type="text" name="userID" placeholder="User ID"><br />
 		Images to upload: <input class="span10" type="file" name="theFile" placeholder="Image File to Upload" accept="image/jpg,image/jpeg,image/png,image/gif,image/bmp,image/tiff"><br />
 		
-		<input class="btn btn-large btn-primary" type="submit" value="Send">
+		<input class="btn btn-large btn-primary" type="submit" value="Send" >
 		<input class="btn btn-large btn-primary" type="reset">
+		
 		</form>
 	</div>
 
