@@ -12,10 +12,14 @@ public class Initialization extends HttpServlet {
 
 		    DriverAdapterCPDS ds = new DriverAdapterCPDS();
 		    ds.setDriver("com.mysql.jdbc.Driver");
-		    ds.setUrl("jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779");
-		    
-		    ds.setUser("ece1779");
-		    ds.setPassword("Sp2012");
+            //ds.setUrl("jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779");
+            ds.setUrl("jdbc:mysql://ece1779db.cf2zhhwzx2tf.us-east-1.rds.amazonaws.com/ece1779group1");
+
+            //ds.setUser("ece1779");
+            //ds.setPassword("Sp2012");
+
+            ds.setUser("group1");
+            ds.setPassword("6075186915");
 
 		    SharedPoolDataSource dbcp = new SharedPoolDataSource();
 		    dbcp.setConnectionPoolDataSource(ds);

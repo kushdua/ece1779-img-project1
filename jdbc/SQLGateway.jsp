@@ -42,9 +42,10 @@
 			
 				// Get DB connection from pool
 			    DataSource dbcp = (DataSource)application.getAttribute("dbpool");
-	
+	%>
+	DBCP = <%= dbcp %><%
 			    con = dbcp.getConnection();
-	
+	%>; CON = <%= con  %><%
 			    // Execute SQL query
 			    Statement stmt = con.createStatement();
 			    ResultSet rs = stmt.executeQuery(query);
@@ -98,7 +99,7 @@
  			<c:out value="${e.message}" />
  			<% 
  			
- 			con.close();
+ 			if(con!=null) con.close();
  			
  			%>
 		 </c:if>

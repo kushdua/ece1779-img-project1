@@ -29,16 +29,15 @@
 <!-- if parameter not specified to page, all uploaded images displayed; else only transformations for specified image are displayed by server side script which writes out page -->
 <div class="container">
     <ul class="thumbnails">
-    <li class="span4">
-    <a href="#" class="thumbnail">
-    <img data-src="holder.js/300x200" alt="">
-    </a>
-    <h3>Thumbnail label</h3>
-	<p>Thumbnail caption...</p>
-	<a class="btn btn-primary" href="#">View transformations</a>
-	<a class="btn" href="#">Download</a>
-    </li>
-    ...
+        <li class="span4">
+            <a href="#" class="thumbnail">
+                <img data-src="holder.js/300x200" alt="">
+            </a>
+            <h3>Thumbnail label</h3>
+	       <p>Thumbnail caption...</p>
+	       <a class="btn btn-primary" href="#">View transformations</a>
+	       <a class="btn" href="#">Download</a>
+        </li>
     </ul>
 </div> <!-- /container -->
 
