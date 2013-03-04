@@ -14,18 +14,22 @@
 </head>
 <body>
 
+<!-- 
 <div class="navbar navbar-inverse">
     <div class="navbar-inner">
         <a class="brand" href="#">ECE1779 AWS Project</a>
         <ul class="nav">
-            <li><a href="welcome.php">Home</a></li>
-            <li><a href="upload.php" class="active">Upload</a></li>
-            <li><a href="view.php">View Gallery</a></li>
-            <li><a href="manage.php">Manager UI</a></li>
-            <li><a href="welcome.php?logout=true">Logout</a></li>
+            <li><a href="welcome.jsp">Home</a></li>
+            <li><a href="upload.jsp" class="active">Upload</a></li>
+            <li><a href="view.jsp">View Gallery</a></li>
+            <li><a href="manage.jsp">Manager UI</a></li>
+            <li><a href="welcome.jsp?logout=true">Logout</a></li>
         </ul>
     </div>
 </div>
+-->
+
+<%@ include file="header.jsp" %>
 
 <div class="container">
     <h1>Upload an image</h1>

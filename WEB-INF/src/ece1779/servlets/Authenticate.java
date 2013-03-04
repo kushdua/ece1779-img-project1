@@ -21,7 +21,6 @@ public class Authenticate extends HttpServlet {
         response.setContentType("text/html");
         HttpSession session = request.getSession();
         boolean rememberMe = !request.getParameter("remember-me").isEmpty();
-        
     	String submit = request.getParameter("submit");
     	if(!submit.isEmpty())
     	{
@@ -53,16 +52,25 @@ public class Authenticate extends HttpServlet {
     	      			session.setAttribute("username", name);
     	      			if(rememberMe)
     	      			{
-    	      				response.addCookie(new Cookie("loggedIn", name));
+    	      				Cookie cookie = new Cookie("loggedIn", name);
+    	      				cookie.setMaxAge(365*24*60*60);
+    	      				response.addCookie(cookie);
     	      			}
     					request.setAttribute("successMessage", "Successfully logged in.");
-    	    			getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    					if(request.getAttribute("redirect")==null)
+    					{
+    						getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    					}
+    					else
+    					{
+    						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
+    					}
     				}
     				else
     				{
     					//Login unsuccessful
     	      			con.close();
-    	    			request.setAttribute("error", "Invalid username/password combination.");
+    	    			request.setAttribute("errorMessage", "Invalid username/password combination.");
     	    			getServletContext().getRequestDispatcher("/welcome.jsp").forward(request, response);
     				}
     			}
@@ -111,10 +119,19 @@ public class Authenticate extends HttpServlet {
     	      			session.setAttribute("username", name);
     	      			if(rememberMe)
     	      			{
-    	      				response.addCookie(new Cookie("loggedIn", name));
+    	      				Cookie cookie = new Cookie("loggedIn", name);
+    	      				cookie.setMaxAge(365*24*60*60);
+    	      				response.addCookie(cookie);
     	      			}
     					request.setAttribute("successMessage", "Successfully registered.");
-    	    			getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    					if(request.getAttribute("redirect")==null)
+    					{
+    						getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    					}
+    					else
+    					{
+    						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
+    					}
     				}
     				else
     				{
@@ -159,7 +176,7 @@ public class Authenticate extends HttpServlet {
     			}
     			else
     			{
-	    			request.setAttribute("error", "Unknown action");
+	    			request.setAttribute("errorMessage", "Unknown action");
     			}
     			getServletContext().getRequestDispatcher("/welcome.jsp").forward(request, response);
     		}
