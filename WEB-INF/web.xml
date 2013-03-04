@@ -119,11 +119,10 @@
         <url-pattern>/servlet/HelloWorld</url-pattern>
     </servlet-mapping>
     
-   <servlet-mapping>
+   <servlet>
         <servlet-name>Authenticate</servlet-name>
-        <url-pattern>/servlet/Authenticate</url-pattern>
         <servlet-class>ece1779.ec2.StartInstance</servlet-class>
-   </servlet-mapping> 
+   </servlet> 
     
 
    <servlet-mapping>
