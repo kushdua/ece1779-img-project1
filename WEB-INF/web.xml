@@ -124,6 +124,10 @@
         <servlet-class>ece1779.ec2.StartInstance</servlet-class>
    </servlet> 
     
+    <servlet-mapping>
+        <servlet-name>Authenticate</servlet-name>
+        <url-pattern>/servlet/Authenticate</url-pattern>
+    </servlet-mapping>
 
    <servlet-mapping>
         <servlet-name>Form</servlet-name>

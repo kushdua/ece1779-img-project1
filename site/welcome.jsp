@@ -21,16 +21,24 @@
 
 <div class="container">
   
-  <form class="form-welcome" action="/servlet/Authenticate" method="post">
-    <h2 class="form-welcome-heading">Please sign in</h2>
-    <input type="text" name="userNameText" class="input-block-level" placeholder="User name">
-    <input type="password" name="passText" class="input-block-level" placeholder="Password">
-    <label class="checkbox">
-      <input type="checkbox" value="remember-me"> Remember me
-    </label>
-    <button class="btn btn-large btn-primary" type="submit" value="signinAcc">Sign in</button>
-    <button class="btn btn-large btn-primary" type="submit" value="createAcc">Create Account</button>
-  </form>
+  <form class="form-welcome" action="/ece1779-img-project1/servlet/Authenticate" method="post">
+			<h2 class="form-welcome-heading">Please sign in</h2>
+			<div class="row">
+				<input type="text" name="userNameText"
+					class="input-block-level span4" placeholder="User name">
+			</div>
+			<div class="row">
+				<input type="password" name="passText"
+					class="input-block-level span4" placeholder="Password">
+			</div>
+			<label class="checkbox"> <input type="checkbox"
+				value="remember-me"> Remember me
+			</label>
+			<button class="btn btn-large btn-primary" type="submit"
+				value="signinAcc">Sign in</button>
+			<button class="btn btn-large btn-primary" type="submit"
+				value="createAcc">Create Account</button>
+		</form>
 
 </div> <!-- /container -->
 
