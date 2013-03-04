@@ -28,12 +28,12 @@
 		<!-- Replace with AWS key for your account -->
 		<init-param>
 			<param-name>AWSaccessKey</param-name>
-			<param-value>AKIAI7C426NYG5B3EAZQ</param-value>
+			<param-value>AKIAJ4G6SHXZMAMCZHDQ</param-value>
 		</init-param>
 		
 		<init-param>
 			<param-name>AWSsecretKey</param-name>
-			<param-value>W0uTsx4JiqbI6QVkrW7DdDnCaEbcTmrsnvw7C6RM</param-value>
+			<param-value>L9LnmJiJtbAhDgrUojqDj+yrsew9iWxawdSH+CsX</param-value>
 		</init-param>
 		
 		<init-param>
