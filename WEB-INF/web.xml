@@ -23,7 +23,7 @@
   	<servlet>
     	<servlet-name>EC2Initialization</servlet-name>
     	<servlet-class>ece1779.ec2.Initialization</servlet-class>
-  		<load-on-startup>3</load-on-startup>
+  		<load-on-startup>1</load-on-startup>
 		
 		<!-- Replace with AWS key for your account -->
 		<init-param>
@@ -49,25 +49,13 @@
 	
 		<init-param>
 			<param-name>dbUser</param-name>
-			<param-value>ece1779group1</param-value>
+			<param-value>group1</param-value>
 		</init-param>
 		
 		<init-param>
 			<param-name>dbPassword</param-name>
 			<param-value>6075186915</param-value>
 		</init-param>
-  	</servlet>
-
-    <servlet>
-    	<servlet-name>JSPInitialization</servlet-name>
-    	<servlet-class>ece1779.jsp.Initialization</servlet-class>
-  		<load-on-startup>1</load-on-startup>
-  	</servlet>
-  	
-  	<servlet>
-    	<servlet-name>JDBCInitialization</servlet-name>
-    	<servlet-class>ece1779.jdbc.Initialization</servlet-class>
-  		<load-on-startup>2</load-on-startup>
   	</servlet>
 
     <servlet>
