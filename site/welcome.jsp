@@ -14,26 +14,30 @@
 </head>
 <body>
 
+<!--  Look at request attributes for success/errorMessages and display as appropriate
+      Add redirect GET parameters and isLoggedIn check (session and cookie) -->
+
 <div class="navbar navbar-inverse">
-	<div class="navbar-inner">
-		<a class="brand" href="#">ECE1779 AWS Project</a>
-		<ul class="nav">
-			<li><a href="#">Home</a></li>
-		</ul>
-	</div>
+    <div class="navbar-inner">
+        <a class="brand" href="#">ECE1779 AWS Project</a>
+        <ul class="nav">
+            <li><a href="welcome.php" class="active">Home</a></li>
+            <li><a href="manage.php" class="active">Manager UI</a></li>
+        </ul>
+    </div>
 </div>
 
 <div class="container">
-
-  <form class="form-welcome" action="/ece1779-img-project1/servlet/Login" method="post">
+  
+  <form class="form-welcome" action="/ece1779-img-project1/servlet/Authenticate" method="post">
     <h2 class="form-welcome-heading">Please sign in</h2>
-    <input type="text" name="userNameText" class="input-block-level" placeholder="Email address">
+    <input type="text" name="userNameText" class="input-block-level" placeholder="User name">
     <input type="password" name="passText" class="input-block-level" placeholder="Password">
     <label class="checkbox">
       <input type="checkbox" value="remember-me"> Remember me
     </label>
-    <button class="btn btn-large btn-primary" type="submit">Sign in</button>
-    <button class="btn btn-large btn-primary" type="submit">Create Account</button>
+    <button class="btn btn-large btn-primary" type="submit" value="signinAcc">Sign in</button>
+    <button class="btn btn-large btn-primary" type="submit" value="createAcc">Create Account</button>
   </form>
 
 </div> <!-- /container -->

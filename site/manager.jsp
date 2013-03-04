@@ -21,7 +21,8 @@
 			<li><a href="welcome.php">Home</a></li>
 			<li><a href="upload.php">Upload</a></li>
 			<li><a href="view.php">View Gallery</a></li>
-			<li><a href="#">Logout</a></li>
+            <li><a href="manage.php" class="active">Manager UI</a></li>
+			<li><a href="welcome.php?logout=true">Logout</a></li>
 		</ul>
 	</div>
 </div>

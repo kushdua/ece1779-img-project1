@@ -63,9 +63,9 @@ public class StartInstance extends HttpServlet {
         out.println("===========================================\n");
 
         try {
-        	String imageId = "ami-37ec3c5e";
+        	String imageId = "ami-394add50";//"ami-37ec3c5e";
         	RunInstancesRequest request = new RunInstancesRequest(imageId,1,1);
-        	request.setKeyName("delara Keys");
+        	request.setKeyName("ece1779-group1-instance-"+System.currentTimeMillis());//"delara Keys");
         	RunInstancesResult result = ec2.runInstances(request);
         	Reservation reservation = result.getReservation();
         	List<Instance> instances = reservation.getInstances();

@@ -119,6 +119,10 @@
         <url-pattern>/servlet/HelloWorld</url-pattern>
     </servlet-mapping>
     
+   <servlet-mapping>
+        <servlet-name>Authenticate</servlet-name>
+        <url-pattern>/servlet/Authenticate</url-pattern>
+   </servlet-mapping> 
     
 
    <servlet-mapping>

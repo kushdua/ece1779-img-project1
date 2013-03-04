@@ -15,15 +15,16 @@
 <body>
 
 <div class="navbar navbar-inverse">
-	<div class="navbar-inner">
-		<a class="brand" href="#">ECE1779 AWS Project</a>
-		<ul class="nav">
-			<li><a href="welcome.php">Home</a></li>
-			<li><a href="upload.php">Upload</a></li>
-			<li><a href="view.php">View Gallery</a></li>
-			<li><a href="#">Logout</a></li>
-		</ul>
-	</div>
+    <div class="navbar-inner">
+        <a class="brand" href="#">ECE1779 AWS Project</a>
+        <ul class="nav">
+            <li><a href="welcome.php">Home</a></li>
+            <li><a href="upload.php">Upload</a></li>
+            <li><a href="view.php" class="active">View Gallery</a></li>
+            <li><a href="manage.php">Manager UI</a></li>
+            <li><a href="welcome.php?logout=true">Logout</a></li>
+        </ul>
+    </div>
 </div>
 
 <!-- if parameter not specified to page, all uploaded images displayed; else only transformations for specified image are displayed by server side script which writes out page -->
