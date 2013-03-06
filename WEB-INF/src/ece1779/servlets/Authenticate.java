@@ -18,11 +18,21 @@ public class Authenticate extends HttpServlet {
 	              HttpServletResponse response)
     throws IOException, ServletException
     {
+		request.setAttribute("errorMessage", "GET not supported.");
+		getServletContext().getRequestDispatcher(request.getHeader("referer")).forward(request, response);
+    }
+
+    // Do this because the servlet uses both post and get
+    public void doPost(HttpServletRequest request,
+    		HttpServletResponse response)
+    				throws IOException, ServletException {
         response.setContentType("text/html");
         HttpSession session = request.getSession();
-        boolean rememberMe = !request.getParameter("remember-me").isEmpty();
-    	String submit = request.getParameter("submit");
-    	if(!submit.isEmpty())
+        boolean rememberMe = (request.getParameter("remember-me")!=null);
+        String signinAcc = request.getParameter("signinAcc");
+        String createAcc = request.getParameter("createAcc");
+    	String submit = (signinAcc==null || signinAcc.isEmpty())?createAcc:signinAcc;
+    	if(submit!=null)
     	{
     		if(submit.compareTo("signinAcc")==0)
     		{
@@ -59,11 +69,13 @@ public class Authenticate extends HttpServlet {
     					request.setAttribute("successMessage", "Successfully logged in.");
     					if(request.getAttribute("redirect")==null)
     					{
-    						getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
+    						response.sendRedirect("/site/view.jsp");
     					}
     					else
     					{
-    						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
+    						//getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
+    						response.sendRedirect(request.getAttribute("redirect").toString());
     					}
     				}
     				else
@@ -71,7 +83,8 @@ public class Authenticate extends HttpServlet {
     					//Login unsuccessful
     	      			con.close();
     	    			request.setAttribute("errorMessage", "Invalid username/password combination.");
-    	    			getServletContext().getRequestDispatcher("/welcome.jsp").forward(request, response);
+    	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
+    	    			response.sendRedirect("/site/welcome.jsp");
     				}
     			}
     			catch(Exception ex) {
@@ -126,11 +139,13 @@ public class Authenticate extends HttpServlet {
     					request.setAttribute("successMessage", "Successfully registered.");
     					if(request.getAttribute("redirect")==null)
     					{
-    						getServletContext().getRequestDispatcher("/view.jsp").forward(request, response);
+    						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
+    						response.sendRedirect("/site/view.jsp");
     					}
     					else
     					{
     						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
+    						response.sendRedirect(request.getAttribute("redirect").toString());
     					}
     				}
     				else
@@ -138,7 +153,8 @@ public class Authenticate extends HttpServlet {
     					//Return error
     	      			con.close();
     	    			request.setAttribute("errorMessage", "Username " + name + " taken. Please try again.");
-    	    			getServletContext().getRequestDispatcher("/welcome.jsp").forward(request, response);
+    	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
+    	    			response.sendRedirect("/site/welcome.jsp");
     				}
     			}
     			catch(Exception ex) {
@@ -158,35 +174,29 @@ public class Authenticate extends HttpServlet {
     	      		}
     	      	}
     		}
-    		else
-    		{
-    			if(request.getParameter("logout").compareTo("true")==0)
-    			{
-    				session.invalidate();
-
-    		    	Cookie [] pageCookies = request.getCookies();
-    		    	for(Cookie c : pageCookies)
-    		    	{
-    		    		if(c.getName().compareTo("loggedIn")==0)
-    		    		{
-    		    			c.setMaxAge(0);
-    		    			break;
-    		    		}
-    		    	}
-    			}
-    			else
-    			{
-	    			request.setAttribute("errorMessage", "Unknown action");
-    			}
-    			getServletContext().getRequestDispatcher("/welcome.jsp").forward(request, response);
-    		}
     	}
-    }
+		else
+		{
+			if(request.getParameter("logout").compareTo("true")==0)
+			{
+				session.invalidate();
 
-    // Do this because the servlet uses both post and get
-    public void doPost(HttpServletRequest request,
-    		HttpServletResponse response)
-    				throws IOException, ServletException {
-    	doGet(request,response);
+		    	Cookie [] pageCookies = request.getCookies();
+		    	for(Cookie c : pageCookies)
+		    	{
+		    		if(c.getName().compareTo("loggedIn")==0)
+		    		{
+		    			c.setMaxAge(0);
+		    			break;
+		    		}
+		    	}
+			}
+			else
+			{
+    			request.setAttribute("errorMessage", "Unknown action");
+			}
+			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
+			response.sendRedirect("/site/welcome.jsp");
+		}
     }
 }

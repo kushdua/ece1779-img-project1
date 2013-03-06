@@ -35,9 +35,9 @@
 				value="remember-me"> Remember me
 			</label>
 			<button class="btn btn-large btn-primary" type="submit"
-				value="signinAcc">Sign in</button>
+				value="signinAcc" name="signinAcc">Sign in</button>
 			<button class="btn btn-large btn-primary" type="submit"
-				value="createAcc">Create Account</button>
+				value="createAcc" name="createAcc">Create Account</button>
 		</form>
 
 </div> <!-- /container -->

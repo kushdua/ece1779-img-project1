@@ -121,7 +121,7 @@
     
    <servlet>
         <servlet-name>Authenticate</servlet-name>
-        <servlet-class>ece1779.ec2.StartInstance</servlet-class>
+        <servlet-class>ece1779.servlets.Authenticate</servlet-class>
    </servlet> 
     
     <servlet-mapping>

@@ -1,12 +1,11 @@
-request.session.username=<%= request.getSession().getAttribute("username") %>
 <% boolean loggedIn=false;
    if(!request.getRequestURI().contains("welcome.jsp"))
    {
 	  // URI takes only base URL no parameters so view.jsp?redirect=welcome.jsp should redirect to welcome.jsp?redirect=view.jsp
       if(request.getSession().getAttribute("username")==null)
       {
-        request.setAttribute("errorMessage", "Please login first.");
-        //getServletContext().getRequestDispatcher("/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
+        //request.setAttribute("errorMessage", "Please login first.");
+        //getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
       }
       else
       {
@@ -20,8 +19,8 @@ request.session.username=<%= request.getSession().getAttribute("username") %>
     	  
     	  if(loggedIn == false)
     	  {
-    	        request.setAttribute("errorMessage", "Please login first.");
-    	        //getServletContext().getRequestDispatcher("/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
+    	        //request.setAttribute("errorMessage", "Please login first.");
+    	        //getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
     	  }
       }
    }
