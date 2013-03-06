@@ -63,13 +63,14 @@ public class FileUpload extends HttpServlet {
 
             // filename on the client
             String fileName = theFile.getName();
+            
    
             // get root directory of web application
             String path =  "/home/ubuntu/workspace/temp_imgs/";           	//this.getServletContext().getRealPath("/");        
 
             
-            String key1 = "MyObjectKey_" + UUID.randomUUID();
-            String key2 = "MyObjectKey_" + UUID.randomUUID();
+            String key1 = "ObjectKey_" + UUID.randomUUID() +"_" + fileName;
+            String key2 = "ObjectKey_" + UUID.randomUUID() +"_" + fileName;
 
             
             String name1 = path+key1;
