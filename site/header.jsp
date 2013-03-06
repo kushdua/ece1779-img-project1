@@ -1,28 +1,50 @@
-<% boolean loggedIn=false;
-   if(!request.getRequestURI().contains("welcome.jsp"))
+
+<%
+   boolean loggedIn=false;
+   boolean onWelcomeAlready=request.getRequestURL().toString().contains("welcome.jsp");
+   
+   if(onWelcomeAlready && request.getParameter("logout")!=null && request.getParameter("logout").compareTo("true")==0)
    {
-	  // URI takes only base URL no parameters so view.jsp?redirect=welcome.jsp should redirect to welcome.jsp?redirect=view.jsp
-      if(request.getSession().getAttribute("username")==null)
-      {
-        //request.setAttribute("errorMessage", "Please login first.");
-        //getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
-      }
-      else
-      {
-    	  for (Cookie c : request.getCookies())
-    	  {
-    		  if(c.getName().compareTo("username")==0)
-    		  {
-    			  loggedIn = true;
-    		  }
-    	  }
-    	  
-    	  if(loggedIn == false)
-    	  {
-    	        //request.setAttribute("errorMessage", "Please login first.");
-    	        //getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
-    	  }
-      }
+	   //response.sendRedirect("/ece1779-img-project1/servlet/Authenticate");
+	   request.getSession().invalidate();
+
+	   Cookie[] pageCookies = request.getCookies();
+	   for (Cookie c : pageCookies) {
+		   if (c.getName().compareTo("loggedIn") == 0) {
+			   c.setMaxAge(0);
+			   break;
+		   }
+	   }
+	   response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
+	}
+   else
+   {
+		// URI takes only base URL no parameters so view.jsp?redirect=welcome.jsp should redirect to welcome.jsp?redirect=view.jsp
+		if (request.getSession().getAttribute("username") == null) {
+			request.setAttribute("errorMessage", "Please login first.");
+			//getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
+			if (!onWelcomeAlready) {
+				response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
+						+ request.getRequestURI());
+			}
+		} else {
+			if (request.getSession().getAttribute("username") != null) {
+				loggedIn = true;
+			} else {
+				for (Cookie c : request.getCookies()) {
+					if (c.getName().compareTo("username") == 0) {
+						loggedIn = true;
+					}
+				}
+			}
+	
+			if (loggedIn == false && !onWelcomeAlready) {
+				request.setAttribute("errorMessage", "Please login first.");
+				//getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
+				response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
+						+ request.getRequestURI());
+			}
+		}
    }
 %>
 

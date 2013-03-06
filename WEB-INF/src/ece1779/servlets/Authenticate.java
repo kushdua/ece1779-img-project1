@@ -18,8 +18,7 @@ public class Authenticate extends HttpServlet {
 	              HttpServletResponse response)
     throws IOException, ServletException
     {
-		request.setAttribute("errorMessage", "GET not supported.");
-		getServletContext().getRequestDispatcher(request.getHeader("referer")).forward(request, response);
+		doPost(request, response);
     }
 
     // Do this because the servlet uses both post and get
@@ -177,24 +176,7 @@ public class Authenticate extends HttpServlet {
     	}
 		else
 		{
-			if(request.getParameter("logout").compareTo("true")==0)
-			{
-				session.invalidate();
-
-		    	Cookie [] pageCookies = request.getCookies();
-		    	for(Cookie c : pageCookies)
-		    	{
-		    		if(c.getName().compareTo("loggedIn")==0)
-		    		{
-		    			c.setMaxAge(0);
-		    			break;
-		    		}
-		    	}
-			}
-			else
-			{
-    			request.setAttribute("errorMessage", "Unknown action");
-			}
+			request.setAttribute("errorMessage", "Unknown action");
 			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
 			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
 		}
