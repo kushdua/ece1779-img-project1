@@ -70,12 +70,12 @@ public class Authenticate extends HttpServlet {
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
-    						response.sendRedirect("/site/view.jsp");
+    						response.sendRedirect("/ece1779-img-project1/site/view.jsp");
     					}
     					else
     					{
     						//getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
-    						response.sendRedirect(request.getAttribute("redirect").toString());
+    						response.sendRedirect("/ece1779-img-project1/"+request.getAttribute("redirect").toString());
     					}
     				}
     				else
@@ -84,7 +84,7 @@ public class Authenticate extends HttpServlet {
     	      			con.close();
     	    			request.setAttribute("errorMessage", "Invalid username/password combination.");
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
-    	    			response.sendRedirect("/site/welcome.jsp");
+    	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
     				}
     			}
     			catch(Exception ex) {
@@ -140,12 +140,12 @@ public class Authenticate extends HttpServlet {
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
-    						response.sendRedirect("/site/view.jsp");
+    						response.sendRedirect("/ece1779-img-project1/site/view.jsp");
     					}
     					else
     					{
     						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
-    						response.sendRedirect(request.getAttribute("redirect").toString());
+    						response.sendRedirect("/ece1779-img-project1/"+request.getAttribute("redirect").toString());
     					}
     				}
     				else
@@ -154,7 +154,7 @@ public class Authenticate extends HttpServlet {
     	      			con.close();
     	    			request.setAttribute("errorMessage", "Username " + name + " taken. Please try again.");
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
-    	    			response.sendRedirect("/site/welcome.jsp");
+    	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
     				}
     			}
     			catch(Exception ex) {
@@ -196,7 +196,7 @@ public class Authenticate extends HttpServlet {
     			request.setAttribute("errorMessage", "Unknown action");
 			}
 			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
-			response.sendRedirect("/site/welcome.jsp");
+			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
 		}
     }
 }
