@@ -11,6 +11,7 @@ import org.apache.commons.fileupload.disk.*;
 import org.apache.commons.fileupload.servlet.*;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
@@ -32,6 +33,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+
 
 import org.im4java.core.*;
 
@@ -120,11 +122,21 @@ public class FileUpload extends HttpServlet {
 	
     }
     
+    private int getUserId()
+    {
+    	/*this method would eventually get the username from the session, query the db to get 
+    	 * the userID, and return the user id. But for testing, setting userid to 1 for now
+    	 *
+    	 */
+    	
+        int userid = 1;
+        return userid;
+    }
+    
     public void updateDatabase(String key, PrintWriter out) {
     	Connection con = null;
     	try{ 
-            // In real life, you should get these values from a shopping cart
-            int userid = 1;
+            
             
 		    // Get DB connection from pool
 		    DataSource dbcp = (DataSource)this.getServletContext().getAttribute("dbpool");
@@ -132,10 +144,26 @@ public class FileUpload extends HttpServlet {
 	
 	
 		    // Execute SQL query
+		    /*
 		    Statement stmt = con.createStatement();
-            String    sql = "insert into files (userId, s3Key) "+
-                      "value(" + userid + ",'" + key + "')";
+		    
+		    //this approach is prone to SQL injection attack, so will be changed later
+            
+		    String    sql = "insert into images (userId, key1, key2, key3, key4) "+
+                      "values(" + getUserId() + ",'" + key + "','" + key + "','"+ key + "','"+ key  + "')";
+            
             stmt.execute(sql);
+            */
+		    String sql = "insert into images (userId, key1, key2, key3, key4) values (?,?,?,?,?) ";
+            PreparedStatement prepStmt = con.prepareStatement(sql);
+            
+            prepStmt.setInt(1,getUserId());
+            prepStmt.setString(2, key);
+            prepStmt.setString(3, key);
+            prepStmt.setString(4, key);
+            prepStmt.setString(5, key);
+            prepStmt.executeUpdate();
+            
         }
     	catch(Exception ex) {
               getServletContext().log(ex.getMessage());  
