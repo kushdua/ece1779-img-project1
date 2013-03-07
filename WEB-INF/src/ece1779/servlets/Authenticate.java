@@ -27,7 +27,7 @@ public class Authenticate extends HttpServlet {
     				throws IOException, ServletException {
         response.setContentType("text/html");
         HttpSession session = request.getSession();
-        boolean rememberMe = (request.getParameter("remember-me")!=null);
+        boolean rememberMe = (request.getParameter("remember-me")!=null && request.getParameter("remember-me").compareTo("remember-me")==0);
         String signinAcc = request.getParameter("signinAcc");
         String createAcc = request.getParameter("createAcc");
     	String submit = (signinAcc==null || signinAcc.isEmpty())?createAcc:signinAcc;
@@ -65,25 +65,28 @@ public class Authenticate extends HttpServlet {
     	      				cookie.setMaxAge(365*24*60*60);
     	      				response.addCookie(cookie);
     	      			}
-    					request.setAttribute("successMessage", "Successfully logged in.");
+    					request.getSession().setAttribute("successMessage", "Successfully logged in.");
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
     						response.sendRedirect("/ece1779-img-project1/site/view.jsp");
+    						return;
     					}
     					else
     					{
     						//getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
     						response.sendRedirect("/ece1779-img-project1/"+request.getAttribute("redirect").toString());
+    						return;
     					}
     				}
     				else
     				{
     					//Login unsuccessful
     	      			con.close();
-    	    			request.setAttribute("errorMessage", "Invalid username/password combination.");
+    	    			request.getSession().setAttribute("errorMessage", "Invalid username/password combination.");
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
     	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
+    	    			return;
     				}
     			}
     			catch(Exception ex) {
@@ -135,25 +138,28 @@ public class Authenticate extends HttpServlet {
     	      				cookie.setMaxAge(365*24*60*60);
     	      				response.addCookie(cookie);
     	      			}
-    					request.setAttribute("successMessage", "Successfully registered.");
+    					request.getSession().setAttribute("successMessage", "Successfully registered.");
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
     						response.sendRedirect("/ece1779-img-project1/site/view.jsp");
+    						return;
     					}
     					else
     					{
     						getServletContext().getRequestDispatcher(request.getAttribute("redirect").toString()).forward(request, response);
     						response.sendRedirect("/ece1779-img-project1/"+request.getAttribute("redirect").toString());
+    						return;
     					}
     				}
     				else
     				{
     					//Return error
     	      			con.close();
-    	    			request.setAttribute("errorMessage", "Username " + name + " taken. Please try again.");
+    	    			request.getSession().setAttribute("errorMessage", "Username " + name + " taken. Please try again.");
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
     	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
+    	    			return;
     				}
     			}
     			catch(Exception ex) {
@@ -176,9 +182,10 @@ public class Authenticate extends HttpServlet {
     	}
 		else
 		{
-			request.setAttribute("errorMessage", "Unknown action");
+			request.getSession().setAttribute("errorMessage", "Unknown action");
 			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
 			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
+			return;
 		}
     }
 }

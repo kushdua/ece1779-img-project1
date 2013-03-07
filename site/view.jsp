@@ -5,7 +5,7 @@
 <!-- Sign in template from Bootstrap site modified for ECE1779 AWS project -->
 <!-- Bootstrap -->
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="boostrap/css/bootstrap-responsive.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -13,21 +13,6 @@
 <![endif]-->
 </head>
 <body>
-
-<!-- 
-<div class="navbar navbar-inverse">
-    <div class="navbar-inner">
-        <a class="brand" href="#">ECE1779 AWS Project</a>
-        <ul class="nav">
-            <li><a href="welcome.jsp">Home</a></li>
-            <li><a href="upload.jsp">Upload</a></li>
-            <li><a href="view.jsp" class="active">View Gallery</a></li>
-            <li><a href="manage.jsp">Manager UI</a></li>
-            <li><a href="welcome.jsp?logout=true">Logout</a></li>
-        </ul>
-    </div>
-</div>
--->
 
 <%@ include file="header.jsp" %>
 

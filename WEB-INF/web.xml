@@ -56,9 +56,19 @@
 			<param-name>dbPassword</param-name>
 			<param-value>6075186915</param-value>
 		</init-param>
+		
+		<init-param>
+		     <param-name>managerUsername</param-name>
+		     <param-value>root</param-value>
+		</init-param>
+        
+        <init-param>
+             <param-name>managerPass</param-name>
+             <param-value>root</param-value>
+        </init-param>
   	</servlet>
 
-    <servlet>
+<!--     <servlet>
         <servlet-name>SampleServletName3</servlet-name>
         <servlet-class>ece1779.servlets.HelloWorld</servlet-class>
     </servlet> 
@@ -94,7 +104,7 @@
 	<servlet>
     	<servlet-name>TransactionExample</servlet-name>
     	<servlet-class>ece1779.jdbc.Transaction</servlet-class>
-  	</servlet>
+  	</servlet> -->
 
 	<servlet>
     	<servlet-name>FileUpload</servlet-name>
@@ -102,10 +112,10 @@
   	</servlet>
 
 
-	<servlet>
+<!-- 	<servlet>
     	<servlet-name>StartInstance</servlet-name>
     	<servlet-class>ece1779.ec2.StartInstance</servlet-class>
-  	</servlet>
+  	</servlet> -->
 
 
 	<servlet>
@@ -114,10 +124,10 @@
   	</servlet>
 
 
-    <servlet-mapping>
+<!--     <servlet-mapping>
         <servlet-name>SampleServletName3</servlet-name>
         <url-pattern>/servlet/HelloWorld</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping> -->
     
    <servlet>
         <servlet-name>Authenticate</servlet-name>
@@ -129,7 +139,7 @@
         <url-pattern>/servlet/Authenticate</url-pattern>
     </servlet-mapping>
 
-   <servlet-mapping>
+<!--    <servlet-mapping>
         <servlet-name>Form</servlet-name>
         <url-pattern>/servlet/Form</url-pattern>
     </servlet-mapping>
@@ -162,17 +172,17 @@
     <servlet-mapping>
         <servlet-name>TransactionExample</servlet-name>
         <url-pattern>/servlet/Transaction</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping> -->
 
     <servlet-mapping>
         <servlet-name>FileUpload</servlet-name>
         <url-pattern>/servlet/FileUpload</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
+<!--     <servlet-mapping>
         <servlet-name>StartInstance</servlet-name>
         <url-pattern>/servlet/StartInstance</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping> -->
 	<servlet-mapping>
         <servlet-name>InstanceMetrics</servlet-name>
         <url-pattern>/servlet/InstanceMetrics</url-pattern>

@@ -1,11 +1,13 @@
-
 <%
    boolean loggedIn=false;
    boolean onWelcomeAlready=request.getRequestURL().toString().contains("welcome.jsp");
+   String userName = "";
+   boolean logoutRequest = false;
    
    if(onWelcomeAlready && request.getParameter("logout")!=null && request.getParameter("logout").compareTo("true")==0)
    {
 	   //response.sendRedirect("/ece1779-img-project1/servlet/Authenticate");
+       logoutRequest = true;
 	   request.getSession().invalidate();
 
 	   Cookie[] pageCookies = request.getCookies();
@@ -15,34 +17,45 @@
 			   break;
 		   }
 	   }
+	   request.getSession().removeAttribute("errorMessage");
 	   response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
+	   return;
 	}
    else
    {
 		// URI takes only base URL no parameters so view.jsp?redirect=welcome.jsp should redirect to welcome.jsp?redirect=view.jsp
 		if (request.getSession().getAttribute("username") == null) {
-			request.setAttribute("errorMessage", "Please login first.");
 			//getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
 			if (!onWelcomeAlready) {
+	            request.getSession().setAttribute("errorMessage", new String("Please login first."));
 				response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
 						+ request.getRequestURI());
+				return;
 			}
 		} else {
 			if (request.getSession().getAttribute("username") != null) {
+				userName = request.getSession().getAttribute("username").toString();
 				loggedIn = true;
 			} else {
 				for (Cookie c : request.getCookies()) {
 					if (c.getName().compareTo("username") == 0) {
+						userName = c.getValue();
 						loggedIn = true;
 					}
 				}
 			}
 	
-			if (loggedIn == false && !onWelcomeAlready) {
-				request.setAttribute("errorMessage", "Please login first.");
+			if (loggedIn == false && !onWelcomeAlready && !logoutRequest) {
+				request.getSession().setAttribute("errorMessage", new String("Please login first."));
 				//getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
 				response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
 						+ request.getRequestURI());
+				return;
+			}
+			else if(loggedIn == true && onWelcomeAlready)
+			{
+			       response.sendRedirect("/ece1779-img-project1/site/view.jsp");
+			       return;
 			}
 		}
    }
@@ -73,14 +86,16 @@
     </div>
 </div>
 
-<% if(request.getAttribute("errorMessage")!=null) { %>
+<% if(request.getSession().getAttribute("errorMessage")!=null) { %>
 <div class="alert alert-error">  
   <a class="close" data-dismiss="alert">×</a>  
-  <strong>Error: </strong> <%= request.getAttribute("errorMessage").toString() %>  
+  <strong>Error: </strong> <%= request.getSession().getAttribute("errorMessage").toString() %> 
+  <% request.getSession().removeAttribute("errorMessage"); %> 
 </div> 
-<% } else if(request.getAttribute("errorMessage")!=null) { %>
+<% } else if(request.getSession().getAttribute("successMessage")!=null) { %>
 <div class="alert alert-success">  
   <a class="close" data-dismiss="alert">×</a>  
-  <strong>Success: </strong> <%= request.getAttribute("errorMessage").toString() %>  
+  <strong>Success: </strong> <%= request.getSession().getAttribute("successMessage").toString() %>  
+  <% request.getSession().removeAttribute("successMessage"); %>
 </div> 
 <% } %>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+<%@page import="org.apache.http.auth.UsernamePasswordCredentials"%>
 <html>
 <head>
 <title>Manage Workers</title>
 <!-- Sign in template from Bootstrap site modified for ECE1779 AWS project -->
 <!-- Bootstrap -->
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="boostrap/css/bootstrap-responsive.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -14,20 +15,25 @@
 </head>
 <body>
 
-<!--  
-<div class="navbar navbar-inverse">
-	<div class="navbar-inner">
-		<a class="brand" href="#">ECE1779 AWS Project</a>
-		<ul class="nav">
-			<li><a href="welcome.jsp">Home</a></li>
-			<li><a href="upload.jsp">Upload</a></li>
-			<li><a href="view.jsp">View Gallery</a></li>
-            <li><a href="manage.jsp" class="active">Manager UI</a></li>
-			<li><a href="welcome.jsp?logout=true">Logout</a></li>
-		</ul>
-	</div>
-</div>
--->
+<%
+	String managerUserName = "";
+
+	if (request.getSession().getAttribute("username") != null) {
+		managerUserName = request.getSession().getAttribute("username").toString();
+	} else {
+		for (Cookie c : request.getCookies()) {
+			if (c.getName().compareTo("username") == 0) {
+				managerUserName = c.getValue();
+			}
+		}
+	}
+	
+	if (managerUserName.compareTo("root") != 0) {
+		request.getSession().setAttribute("errorMessage", "Only root can access management console");
+		response.sendRedirect("/ece1779-img-project1/site/view.jsp");
+		return;
+	}
+%>
 
 <%@ include file="header.jsp" %>
 
