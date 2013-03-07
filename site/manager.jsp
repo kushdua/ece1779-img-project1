@@ -108,6 +108,7 @@ try {
         	//Stats available for this instance
         	%>
         	<tr>
+        	   <% if(dimensions.size() > 0) { %>
         	   <td>Worker <%= count %></td>
         	   <% for(Object o : dimensions.toArray())
         		   {
@@ -118,6 +119,7 @@ try {
         		   }
         	   %>
         	   <td><%= stats.getDatapoints().get(0).toString() %></td>
+        	   <% } %>
             </tr><%
         }
     }
