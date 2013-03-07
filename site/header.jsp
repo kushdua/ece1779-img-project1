@@ -1,6 +1,6 @@
 <%
    boolean loggedIn=false;
-   boolean onWelcomeAlready=request.getRequestURL().toString().contains("welcome.jsp");
+   boolean onWelcomeAlready=request.getRequestURI().toString().contains("welcome.jsp");
    String userName = "";
    boolean logoutRequest = false;
    
@@ -17,6 +17,7 @@
 			   break;
 		   }
 	   }
+	   //Session was invalidated, what would getSession() return? new session?
 	   request.getSession().removeAttribute("errorMessage");
 	   response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
 	   return;
@@ -32,32 +33,30 @@
 						+ request.getRequestURI());
 				return;
 			}
+
+            for (Cookie c : request.getCookies()) {
+                if (c.getName().compareTo("username") == 0) {
+                    userName = c.getValue();
+                    loggedIn = true;
+                }
+            }
 		} else {
-			if (request.getSession().getAttribute("username") != null) {
-				userName = request.getSession().getAttribute("username").toString();
-				loggedIn = true;
-			} else {
-				for (Cookie c : request.getCookies()) {
-					if (c.getName().compareTo("username") == 0) {
-						userName = c.getValue();
-						loggedIn = true;
-					}
-				}
-			}
-	
-			if (loggedIn == false && !onWelcomeAlready && !logoutRequest) {
-				request.getSession().setAttribute("errorMessage", new String("Please login first."));
-				//getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
-				response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
-						+ request.getRequestURI());
-				return;
-			}
-			else if(loggedIn == true && onWelcomeAlready)
-			{
-			       response.sendRedirect("/ece1779-img-project1/site/view.jsp");
-			       return;
-			}
+			userName = request.getSession().getAttribute("username").toString();
+			loggedIn = true;
 		}
+	    
+        if (loggedIn == false && !onWelcomeAlready && !logoutRequest) {
+            request.getSession().setAttribute("errorMessage", new String("Please login first."));
+            //getServletContext().getRequestDispatcher("/site/welcome.jsp?redirect="+request.getRequestURI()).forward(request, response);
+            response.sendRedirect("/ece1779-img-project1/site/welcome.jsp?redirect="
+                    + request.getRequestURI());
+            return;
+        }
+        else if(loggedIn == true && onWelcomeAlready)
+        {
+               response.sendRedirect("/ece1779-img-project1/site/view.jsp");
+               return;
+        }
    }
 %>
 

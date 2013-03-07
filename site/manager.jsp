@@ -1,5 +1,14 @@
 <!DOCTYPE html>
-<%@page import="org.apache.http.auth.UsernamePasswordCredentials"%>
+<%@page import="com.amazonaws.AmazonClientException" %>
+<%@page import="com.amazonaws.AmazonServiceException" %>
+<%@page import="com.amazonaws.auth.BasicAWSCredentials" %>
+<%@page import="com.amazonaws.auth.PropertiesCredentials" %>
+<%@page import="com.amazonaws.services.cloudwatch.*" %>
+<%@page import="com.amazonaws.services.cloudwatch.model.*" %>
+<%@page import="java.util.List" %>
+<%@page import="java.util.Vector" %>
+<%@page import="java.util.Date" %>
+
 <html>
 <head>
 <title>Manage Workers</title>
@@ -50,17 +59,70 @@
 				<div class="accordion-inner">
 				    <table class="table table-striped">
 				    	<tr>
-				    		<th>Worker</td>
-				    		<th>CPU Load</td>
+				    		<th>Worker</th>
+				    		<th>Instance ID</th>
+				    		<th>CPU Load</th>
 				    	</tr>
-						<tr>
-							<td>Worker 1</td>
-							<td>0 <!-- retrieve value from metrics gathering here --></td>
-						</tr>
-						<tr>
-							<td>Worker 2</td>
-							<td>0 <!-- retrieve value from metrics gathering here --></td>
-						</tr>
+				    	
+<%
+BasicAWSCredentials awsCredentials = (BasicAWSCredentials)getServletContext().getAttribute("AWSCredentials");
+
+AmazonCloudWatch cw = new AmazonCloudWatchClient(awsCredentials);
+
+try {
+
+    ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
+    listMetricsRequest.setMetricName("CPUUtilization");
+    listMetricsRequest.setNamespace("AWS/EC2");
+    ListMetricsResult result = cw.listMetrics(listMetricsRequest);
+    java.util.List<Metric>  metrics = result.getMetrics();
+    for (Metric metric : metrics) {
+        String namespace = metric.getNamespace();
+        String metricName = metric.getMetricName();
+        List<Dimension> dimensions = metric.getDimensions();
+        GetMetricStatisticsRequest statisticsRequest = new GetMetricStatisticsRequest();
+        statisticsRequest.setNamespace(namespace);
+        statisticsRequest.setMetricName(metricName);
+        statisticsRequest.setDimensions(dimensions);
+        Date endTime = new Date();
+        Date startTime = new Date();
+        startTime.setTime(endTime.getTime()-1200000);
+        //Get stats for last 20 minutes
+        statisticsRequest.setStartTime(startTime);
+        statisticsRequest.setEndTime(endTime);
+        statisticsRequest.setPeriod(60);
+        Vector<String>statistics = new Vector<String>();
+        statistics.add("Maximum");
+        statisticsRequest.setStatistics(statistics);
+        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
+        
+        int count = 1;
+        
+        /* out.print("<p>");
+        out.print("Namespace = " + namespace + " Metric = " + metricName + " Dimensions = " + dimensions);
+        out.print(" Values = " + stats.toString());
+        out.println("</p>"); */
+        
+        if(stats.getDatapoints().size()>0)
+        {
+        	//Stats available for this instance
+        	%>
+        	<tr>
+        	   <td>Worker <%= count %></td>
+        	   <% for(Object o : dimensions.toArray())
+        		   {
+        		      if(o.toString().compareTo("InstanceId")==0)
+        		      {
+        		    	  %><td><%= o.toString() %></td><% break;
+        		      }
+        		   }
+        	   %>
+        	   <td><%= stats.getDatapoints().get(0).toString() %></td>
+            </tr><%
+        }
+    }
+} catch (AmazonServiceException ase) { } catch (AmazonClientException ace) { }
+%>
 				    </table>
 				</div>
 			</div>
