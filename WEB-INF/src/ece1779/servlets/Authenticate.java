@@ -65,7 +65,7 @@ public class Authenticate extends HttpServlet {
     	      				cookie.setMaxAge(365*24*60*60);
     	      				response.addCookie(cookie);
     	      			}
-    					request.getSession().setAttribute("successMessage", "Successfully logged in.");
+    					request.getSession().setAttribute("successMessage", new String("Successfully logged in."));
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
@@ -83,7 +83,7 @@ public class Authenticate extends HttpServlet {
     				{
     					//Login unsuccessful
     	      			con.close();
-    	    			request.getSession().setAttribute("errorMessage", "Invalid username/password combination.");
+    	    			request.getSession().setAttribute("errorMessage", new String("Invalid username/password combination."));
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
     	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
     	    			return;
@@ -138,7 +138,7 @@ public class Authenticate extends HttpServlet {
     	      				cookie.setMaxAge(365*24*60*60);
     	      				response.addCookie(cookie);
     	      			}
-    					request.getSession().setAttribute("successMessage", "Successfully registered.");
+    					request.getSession().setAttribute("successMessage", new String("Successfully registered."));
     					if(request.getAttribute("redirect")==null)
     					{
     						//getServletContext().getRequestDispatcher("/site/view.jsp").forward(request, response);
@@ -156,7 +156,7 @@ public class Authenticate extends HttpServlet {
     				{
     					//Return error
     	      			con.close();
-    	    			request.getSession().setAttribute("errorMessage", "Username " + name + " taken. Please try again.");
+    	    			request.getSession().setAttribute("errorMessage", new String("Username " + name + " taken. Please try again."));
     	    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
     	    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
     	    			return;
@@ -182,7 +182,7 @@ public class Authenticate extends HttpServlet {
     	}
 		else
 		{
-			request.getSession().setAttribute("errorMessage", "Unknown action");
+			request.getSession().setAttribute("errorMessage", new String("Unknown action"));
 			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
 			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
 			return;

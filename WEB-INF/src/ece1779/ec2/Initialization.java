@@ -19,7 +19,7 @@ public class Initialization extends HttpServlet {
     		ServletContext context = config.getServletContext();
     			
     		context.setAttribute("AWSCredentials", awsCredentials);
-    		
+
     		String dbDriver = config.getInitParameter("dbDriver");
     		String dbURL = config.getInitParameter("dbURL");
     		String dbUser = config.getInitParameter("dbUser");

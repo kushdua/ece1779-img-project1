@@ -29,7 +29,7 @@
 	}
 	
 	if (managerUserName.compareTo("root") != 0) {
-		request.getSession().setAttribute("errorMessage", "Only root can access management console");
+		request.getSession().setAttribute("errorMessage", new String("Only root can access management console"));
 		response.sendRedirect("/ece1779-img-project1/site/view.jsp");
 		return;
 	}
@@ -51,7 +51,7 @@
 				    <table class="table table-striped">
 				    	<tr>
 				    		<th>Worker</td>
-				    		<th>Load</td>
+				    		<th>CPU Load</td>
 				    	</tr>
 						<tr>
 							<td>Worker 1</td>

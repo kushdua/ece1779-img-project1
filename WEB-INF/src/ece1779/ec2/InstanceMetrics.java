@@ -67,6 +67,7 @@ public class InstanceMetrics extends HttpServlet {
             	Date endTime = new Date();
             	Date startTime = new Date();
             	startTime.setTime(endTime.getTime()-1200000);
+            	//Get stats for last 20 minutes
             	statisticsRequest.setStartTime(startTime);
             	statisticsRequest.setEndTime(endTime);
             	statisticsRequest.setPeriod(60);
@@ -77,10 +78,8 @@ public class InstanceMetrics extends HttpServlet {
             	
             	out.print("<p>");
             	out.print("Namespace = " + namespace + " Metric = " + metricName + " Dimensions = " + dimensions);
-            	out.print("Values = " + stats.toString());
+            	out.print(" Values = " + stats.toString());
             	out.println("</p>");
-            	
-        		
             }
         	
         } catch (AmazonServiceException ase) {
