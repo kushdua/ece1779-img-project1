@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -28,6 +29,19 @@ public class LoadBalance extends HttpServlet {
 	int ratioGrow = 2;
 	int ratioShrink = 2;
 	
+	//Manager params from web.xml
+	String managerInstanceID = "";
+	
+    public void init(ServletConfig config) {
+    	try {
+		    //Initialize connection pool
+    		managerInstanceID = config.getInitParameter("managerInstanceID");
+    	}
+    	catch(Exception e)
+    	{
+    		//Nothing...
+    	}
+    }
     public void doGet(HttpServletRequest request,
 	              HttpServletResponse response)
     throws IOException, ServletException
@@ -40,9 +54,9 @@ public class LoadBalance extends HttpServlet {
     		HttpServletResponse response)
     				throws IOException, ServletException {
     	try {
-			response.getWriter().println("Instance ID = " + retrieveInstanceId());
+			response.getWriter().println("Instance ID = " + retrieveInstanceId() + "; manager instance ID = " + managerInstanceID);
 		} catch (Exception e) {
-			response.getWriter().println("Couldn't retrieve instance ID - error: " + e.getMessage());
+			response.getWriter().println("Couldn't retrieve instance ID - error: " + e.getMessage() + "\nManager Instance ID = " + managerInstanceID);
 		}
     	
     	

@@ -38,37 +38,38 @@
 			con = dbcp.getConnection();
 
 			// Execute SQL query
-			PreparedStatement stmt = con.prepareStatement("select key1,key2,key3,key4 from images where login=?;");
+			PreparedStatement stmt = con.prepareStatement("select key1,key2,key3,key4 from images where userId IN (SELECT id FROM users WHERE login=?);");
 			stmt.setString(1, userName);
 			
 			ResultSet rs = stmt.executeQuery();
+			boolean printedHeader=false;
 			
-			if(rs.next())
+			while(rs.next())
 			{
 				//Login successful
       			//con.close();
 				//session.setAttribute("username", name);
-				%>
-      			 <li class="span4">
-	                 <a href="#" class="thumbnail">
-	                     <img data-src="s3.amazonaws.com/ece1779-group1/<%=rs.getInt(1)%>" alt="">
+				if(!printedHeader) { %>
+				    <li><span class="span4">Original Image</span><span class="span6">Transformations</span></li>
+				<% } %>
+      			 <li>
+	                 <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(1)%>" class="thumbnail span4">
+	                     <img src="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(1)%>" alt="">
 	                 </a>
-                 	<!--<h2>Thumbnail label</h2> -->
-	     	       	<!-- <p>Thumbnail caption...</p> -->
-	     	       	<a class="btn btn-primary" href="#">View transformations</a>
-	     	       	<a class="btn" href="#">Download</a>
+	                 
+                     <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(2)%>" class="thumbnail span2">
+                         <img src="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(2)%>" alt="">
+                     </a>
+                     
+                     <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(3)%>" class="thumbnail span2">
+                         <img src="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(3)%>" alt="">
+                     </a>
+                     
+                     <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(4)%>" class="thumbnail span2">
+                         <img src="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(4)%>" alt="">
+                     </a>
              	</li>
-             <%
-			}
-			else
-			{
-				//Login unsuccessful
-      			con.close();
-    			//request.getSession().setAttribute("errorMessage", new String("Invalid username/password combination."));
-    			//getServletContext().getRequestDispatcher("/site/welcome.jsp").forward(request, response);
-    			response.sendRedirect("/ece1779-img-project1/site/welcome.jsp");
-    			return;
-			}
+             <%}
 		}
 		catch(Exception ex) {
     		try {
