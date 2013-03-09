@@ -1,0 +1,1 @@
+<% //read metrics (stored in static array in some class perhaps?), see if need to LB and redirect request accordingly... %>

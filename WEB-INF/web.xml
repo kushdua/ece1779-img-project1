@@ -66,8 +66,38 @@
              <param-name>managerPass</param-name>
              <param-value>root</param-value>
         </init-param>
+        
+        <init-param>
+             <param-name>managerInstanceIP</param-name>
+             <param-value>54.235.69.246</param-value>
+        </init-param>
+        
+        <init-param>
+             <param-name>managerInstanceID</param-name>
+             <param-value>i-84ec54f7</param-value>
+        </init-param>
   	</servlet>
 
+   <servlet>
+        <servlet-name>Authenticate</servlet-name>
+        <servlet-class>ece1779.servlets.Authenticate</servlet-class>
+   </servlet> 
+    
+    <servlet-mapping>
+        <servlet-name>Authenticate</servlet-name>
+        <url-pattern>/servlet/Authenticate</url-pattern>
+    </servlet-mapping>
+
+   <servlet>
+        <servlet-name>LoadBalance</servlet-name>
+        <servlet-class>ece1779.servlets.LoadBalance</servlet-class>
+   </servlet> 
+    
+    <servlet-mapping>
+        <servlet-name>LoadBalance</servlet-name>
+        <url-pattern>/servlet/LoadBalance</url-pattern>
+    </servlet-mapping>
+    
 <!--     <servlet>
         <servlet-name>SampleServletName3</servlet-name>
         <servlet-class>ece1779.servlets.HelloWorld</servlet-class>
@@ -128,16 +158,6 @@
         <servlet-name>SampleServletName3</servlet-name>
         <url-pattern>/servlet/HelloWorld</url-pattern>
     </servlet-mapping> -->
-    
-   <servlet>
-        <servlet-name>Authenticate</servlet-name>
-        <servlet-class>ece1779.servlets.Authenticate</servlet-class>
-   </servlet> 
-    
-    <servlet-mapping>
-        <servlet-name>Authenticate</servlet-name>
-        <url-pattern>/servlet/Authenticate</url-pattern>
-    </servlet-mapping>
 
 <!--    <servlet-mapping>
         <servlet-name>Form</servlet-name>
