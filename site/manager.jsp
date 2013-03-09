@@ -61,7 +61,7 @@
 				    	<tr>
 				    		<th>Worker</th>
 				    		<th>Instance ID</th>
-				    		<th>CPU Load</th>
+				    		<th>CPU Load (Percent)</th>
 				    	</tr>
 				    	
 <%
@@ -76,6 +76,7 @@ try {
     listMetricsRequest.setNamespace("AWS/EC2");
     ListMetricsResult result = cw.listMetrics(listMetricsRequest);
     java.util.List<Metric>  metrics = result.getMetrics();
+    int count = 0;
     for (Metric metric : metrics) {
         String namespace = metric.getNamespace();
         String metricName = metric.getMetricName();
@@ -96,19 +97,23 @@ try {
         statisticsRequest.setStatistics(statistics);
         GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
         
-        int count = 1;
+        
         
         /* out.print("<p>");
         out.print("Namespace = " + namespace + " Metric = " + metricName + " Dimensions = " + dimensions);
         out.print(" Values = " + stats.toString());
         out.println("</p>"); */
         
-        if(stats.getDatapoints().size()>0)
+        if(stats.getDatapoints().size()>0  )
         {
         	//Stats available for this instance
+        		
         	%>
         	<tr>
-        	   <% if(dimensions.size() > 0) { %>
+        	   <% if(dimensions.size() > 0 && dimensions.get(0).getName().equals("InstanceId")  ) {
+        	   		count++;
+        	   		//dimensions.get(0).getName().equals("InstanceId") ;
+        	   %>
         	   <td>Worker <%= count %></td>
         	   <% for(Object o : dimensions.toArray())
         		   {
@@ -118,7 +123,8 @@ try {
         		      }
         		   }
         	   %>
-        	   <td><%= stats.getDatapoints().get(0).toString() %></td>
+        	   <td><%=  dimensions.get(0).getValue()  %></td>
+        	   <td><%= stats.getDatapoints().get(0).getMaximum() %></td>
         	   <% } %>
             </tr><%
         }
