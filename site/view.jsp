@@ -42,18 +42,17 @@
 			stmt.setString(1, userName);
 			
 			ResultSet rs = stmt.executeQuery();
-			boolean printedHeader=false;
+			int numPrinted = 0;
 			
 			while(rs.next())
 			{
 				//Login successful
       			//con.close();
 				//session.setAttribute("username", name);
-				if(!printedHeader) { %>
-				    <li><span class="span4">Original Image</span><span class="span6">Transformations</span></li>
-				<% } %>
+				numPrinted++; %>
+				 <li><span class="span3">Original Image</span><span class="span6">Transformations</span></li>
       			 <li>
-	                 <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(1)%>" class="thumbnail span4">
+	                 <a href="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(1)%>" class="thumbnail span3">
 	                     <img src="http://s3.amazonaws.com/ece1779-group1/<%=rs.getString(1)%>" alt="">
 	                 </a>
 	                 
@@ -70,6 +69,15 @@
                      </a>
              	</li>
              <%}
+			if(numPrinted==0)
+			{ %>
+
+			<div class="alert alert-error">
+				<a class="close" data-dismiss="alert">×</a>
+				<strong>No uploaded images.</strong>
+			</div>
+
+			<% }
 		}
 		catch(Exception ex) {
     		try {
