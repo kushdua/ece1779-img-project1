@@ -98,8 +98,8 @@ public class FileUpload extends HttpServlet {
             File file3 = new File(name3);
             
             op = new IMOperation();
-            op.addImage();
-            op.rotate(180.0);
+            op.addImage();            
+            op.flop();
             op.addImage();
             
             cmd = new ConvertCmd();
@@ -114,11 +114,14 @@ public class FileUpload extends HttpServlet {
         	s3SaveFile(file3, key3, request, response);
         	s3SaveFile(file4, key4, request, response);
             
-        	updateDatabase(key1, key2, key3, key4, name);
+        	String username = (String)request.getSession().getAttribute("username");
+        	updateDatabase(key1, key2, key3, key4, username);
         	    
         	request.getSession().setAttribute("successMessage", new String("Successfully uploaded and transformed " + fileName));
         	response.setContentType("text/html");
-        	response.sendRedirect(request.getRequestURI());
+        	//response.sendRedirect(request.getRequestURI());
+        	response.sendRedirect("/ece1779-img-project1/site/upload.jsp");
+        	
         	return;
 //        	response.setContentType("text/html");
 //            
