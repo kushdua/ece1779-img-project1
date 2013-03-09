@@ -74,9 +74,11 @@
             <%= (request.getRequestURI().contains("view.jsp"))?
                     "<li><a href='view.jsp' class='active'>View Gallery</a></li>" : 
                     "<li><a href='view.jsp'>View Gallery</a></li>" %>
+         <% if(userName.compareTo("root")==0) { %>
             <%= (request.getRequestURI().contains("manager.jsp"))?
                     "<li><a href='manager.jsp' class='active'>Manager UI</a></li>" : 
                     "<li><a href='manager.jsp'>Manager UI</a></li>" %>
+         <% } %>
             <%= (request.getRequestURI().contains("welcome.jsp?logout=true"))?
                     "<li><a href='welcome.jsp?logout=true' class='active'>Logout</a></li>" : 
                     "<li><a href='welcome.jsp?logout=true'>Logout</a></li>" %>
