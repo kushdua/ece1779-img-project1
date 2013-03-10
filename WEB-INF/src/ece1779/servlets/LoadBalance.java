@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+//Servlet used to invoke ertain LoadBalancerLibrary functions or to print out values for debug purposes
 public class LoadBalance extends HttpServlet {
 	
 	//mgr config
@@ -46,13 +47,11 @@ public class LoadBalance extends HttpServlet {
     	try {
     		
 		    //Initialize connection pool
-    		managerInstanceID = getServletConfig().getInitParameter("managerInstanceID");
+    		managerInstanceID = getServletContext().getInitParameter("managerInstanceID");
 			response.getWriter().println("Instance ID = " + retrieveInstanceId() + "; manager instance ID = " + managerInstanceID);
 		} catch (Exception e) {
 			response.getWriter().println("Couldn't retrieve instance ID - error: " + e.getMessage() + "\nManager Instance ID = " + managerInstanceID);
 		}
-    	
-    	
     }
     
     public static String retrieveInstanceId() throws Exception 

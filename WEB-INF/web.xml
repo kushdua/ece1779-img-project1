@@ -66,16 +66,6 @@
              <param-name>managerPass</param-name>
              <param-value>root</param-value>
         </init-param>
-        
-        <init-param>
-             <param-name>managerInstanceIP</param-name>
-             <param-value>54.235.69.246</param-value>
-        </init-param>
-        
-        <init-param>
-             <param-name>managerInstanceID</param-name>
-             <param-value>i-84ec54f7</param-value>
-        </init-param>
   	</servlet>
 
    <servlet>
@@ -97,6 +87,16 @@
         <servlet-name>LoadBalance</servlet-name>
         <url-pattern>/servlet/LoadBalance</url-pattern>
     </servlet-mapping>
+
+	<context-param>
+		<param-name>managerInstanceIP</param-name>
+		<param-value>54.235.69.246</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>managerInstanceID</param-name>
+		<param-value>i-84ec54f7</param-value>
+	</context-param>
     
 <!--     <servlet>
         <servlet-name>SampleServletName3</servlet-name>
