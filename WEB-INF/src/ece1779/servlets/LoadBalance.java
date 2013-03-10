@@ -32,16 +32,6 @@ public class LoadBalance extends HttpServlet {
 	//Manager params from web.xml
 	String managerInstanceID = "";
 	
-    public void init(ServletConfig config) {
-    	try {
-		    //Initialize connection pool
-    		managerInstanceID = config.getInitParameter("managerInstanceID");
-    	}
-    	catch(Exception e)
-    	{
-    		//Nothing...
-    	}
-    }
     public void doGet(HttpServletRequest request,
 	              HttpServletResponse response)
     throws IOException, ServletException
@@ -54,6 +44,8 @@ public class LoadBalance extends HttpServlet {
     		HttpServletResponse response)
     				throws IOException, ServletException {
     	try {
+		    //Initialize connection pool
+    		managerInstanceID = config.getInitParameter("managerInstanceID");
 			response.getWriter().println("Instance ID = " + retrieveInstanceId() + "; manager instance ID = " + managerInstanceID);
 		} catch (Exception e) {
 			response.getWriter().println("Couldn't retrieve instance ID - error: " + e.getMessage() + "\nManager Instance ID = " + managerInstanceID);
