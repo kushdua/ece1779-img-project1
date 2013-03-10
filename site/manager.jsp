@@ -30,9 +30,12 @@
 	if (request.getSession().getAttribute("username") != null) {
 		managerUserName = request.getSession().getAttribute("username").toString();
 	} else {
-		for (Cookie c : request.getCookies()) {
-			if (c.getName().compareTo("username") == 0) {
-				managerUserName = c.getValue();
+		if(request.getCookies()!=null)
+		{
+			for (Cookie c : request.getCookies()) {
+				if (c.getName().compareTo("username") == 0) {
+					managerUserName = c.getValue();
+				}
 			}
 		}
 	}
