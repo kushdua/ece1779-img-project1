@@ -14,7 +14,6 @@
 </head>
 <body>
 
-<%@ include file="load_balance.jsp" %>
 <%@ include file="header.jsp" %>
 
 <div class="container">

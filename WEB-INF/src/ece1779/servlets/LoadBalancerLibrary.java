@@ -39,15 +39,22 @@ import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
 
+import ece1779.ec2.WorkerRecord;
+
 public class LoadBalancerLibrary {
 	private static LoadBalancerLibrary instance = null;
 	private HashMap<String, WorkerRecord> workerPool = new HashMap<String, WorkerRecord>(); 
 	int currPoolSize = 0; //number of active workers
 	int inactivePoolSize = 0; //number of inactive workers
-	
+
+	String currentInstanceID = "";
 	//Manager params from web.xml
 	String managerInstanceID = "";
-	String currentInstanceID = "";
+	String manualWorkerSetSize = "2";
+	String cpuThresholdGrowing = "20.0";
+	String cpuThresholdShrinking = "5.0";
+	String ratioExpandPool = "2";
+	String ratioShrinkPool = "2";
 	
 	public LoadBalancerLibrary()
 	{
@@ -135,7 +142,7 @@ public class LoadBalancerLibrary {
     	        		String status = state.get(0).getInstanceState().getName();
     	        		if(status.compareTo(InstanceStateName.Running.toString())==0)
     	        		{
-    	        			newWorker.isActive=true;
+    	        			newWorker.setActive(true);
     	        		}
         	        	workerPool.put(newWorker.getInstanceID(), newWorker);
     	        	}
@@ -147,11 +154,25 @@ public class LoadBalancerLibrary {
     public void loadBalance(ServletContext servletContext) throws Exception
     {
 		managerInstanceID = servletContext.getInitParameter("managerInstanceID");
+		
 		currentInstanceID = retrieveInstanceId();
 		if(currentInstanceID.compareTo(managerInstanceID) == 0)
 		{
 			//Load balance if need be
+			updateWorkerStats(servletContext);
+			double totalLoad = 0.0d;
+			int workerCount = 0;
+			double avgLoad = 0.0d;
+			for(WorkerRecord w : workerPool.values())
+			{
+				totalLoad += w.getCpuLoad();
+				workerCount++;
+			}
 			
+			if(workerCount>0)
+			{
+				avgLoad = (double)(totalLoad / workerCount);
+			}
 		}
     }
 	
@@ -192,36 +213,5 @@ public class LoadBalancerLibrary {
         register.setLoadBalancerName("loader");
         register.setInstances((Collection)instanceId);
         RegisterInstancesWithLoadBalancerResult registerWithLoadBalancerResult= elb.registerInstancesWithLoadBalancer(register);
-	}
-
-	public class WorkerRecord
-	{
-		private String instanceID = "";
-		private double cpuLoad = 0.0f;
-		private boolean isActive = true;
-		
-		public String getInstanceID() {
-			return instanceID;
-		}
-		
-		public void setInstanceID(String instanceID) {
-			this.instanceID = instanceID;
-		}
-		
-		public double getCpuLoad() {
-			return cpuLoad;
-		}
-		
-		public void setCpuLoad(double cpuLoad) {
-			this.cpuLoad = cpuLoad;
-		}
-		
-		public boolean isActive() {
-			return isActive;
-		}
-		
-		public void setActive(boolean isActive) {
-			this.isActive = isActive;
-		}
 	}
 }
