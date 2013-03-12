@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<%@page import="org.apache.tomcat.jni.Library"%>
+<%@page import="java.util.Map"%>
+<%@page import="ece1779.servlets.LoadBalancerLibrary.WorkerRecord"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="ece1779.servlets.LoadBalancerLibrary"%>
 <%@page import="com.amazonaws.AmazonClientException" %>
 <%@page import="com.amazonaws.AmazonServiceException" %>
 <%@page import="com.amazonaws.auth.BasicAWSCredentials" %>
@@ -73,65 +78,29 @@ BasicAWSCredentials awsCredentials = (BasicAWSCredentials)getServletContext().ge
 AmazonCloudWatch cw = new AmazonCloudWatchClient(awsCredentials);
 
 try {
-
-    ListMetricsRequest listMetricsRequest = new ListMetricsRequest();
-    listMetricsRequest.setMetricName("CPUUtilization");
-    listMetricsRequest.setNamespace("AWS/EC2");
-    ListMetricsResult result = cw.listMetrics(listMetricsRequest);
-    java.util.List<Metric>  metrics = result.getMetrics();
-    int count = 0;
-    for (Metric metric : metrics) {
-        String namespace = metric.getNamespace();
-        String metricName = metric.getMetricName();
-        List<Dimension> dimensions = metric.getDimensions();
-        GetMetricStatisticsRequest statisticsRequest = new GetMetricStatisticsRequest();
-        statisticsRequest.setNamespace(namespace);
-        statisticsRequest.setMetricName(metricName);
-        statisticsRequest.setDimensions(dimensions);
-        Date endTime = new Date();
-        Date startTime = new Date();
-        startTime.setTime(endTime.getTime()-1200000);
-        //Get stats for last 20 minutes
-        statisticsRequest.setStartTime(startTime);
-        statisticsRequest.setEndTime(endTime);
-        statisticsRequest.setPeriod(60);
-        Vector<String>statistics = new Vector<String>();
-        statistics.add("Maximum");
-        statisticsRequest.setStatistics(statistics);
-        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
-        
-        
-        
         /* out.print("<p>");
         out.print("Namespace = " + namespace + " Metric = " + metricName + " Dimensions = " + dimensions);
         out.print(" Values = " + stats.toString());
         out.println("</p>"); */
+        LoadBalancerLibrary.getInstance().updateWorkerStats(getServletContext());
+        HashMap<String, WorkerRecord> workerPool = LoadBalancerLibrary.getInstance().getWorkerPool();
+        int count = 0;
         
-        if(stats.getDatapoints().size()>0  )
+        if(workerPool.size() > 0)
         {
-        	//Stats available for this instance
-        		
-        	%>
-        	<tr>
-        	   <% if(dimensions.size() > 0 && dimensions.get(0).getName().equals("InstanceId")  ) {
-        	   		count++;
-        	   		//dimensions.get(0).getName().equals("InstanceId") ;
-        	   %>
-        	   <td>Worker <%= count %></td>
-        	   <% for(Object o : dimensions.toArray())
-        		   {
-        		      if(o.toString().compareTo("InstanceId")==0)
-        		      {
-        		    	  %><td><%= o.toString() %></td><% break;
-        		      }
-        		   }
-        	   %>
-        	   <td><%=  dimensions.get(0).getValue()  %></td>
-        	   <td><%= stats.getDatapoints().get(0).getMaximum() %></td>
-        	   <% } %>
-            </tr><%
+        	//Stats available
+        	count++;
+        	%> 
+        	   <% for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
+        		   
+        	   { %>
+                   <tr>
+                      <td>Worker <%= count %></td>
+        		      <td><%= o.getValue().getInstanceID() %></td>
+        		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
+                   </tr>
+        	   <% }
         }
-    }
 } catch (AmazonServiceException ase) { } catch (AmazonClientException ace) { }
 %>
 				    </table>
