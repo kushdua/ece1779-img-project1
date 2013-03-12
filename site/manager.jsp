@@ -131,8 +131,8 @@ try {
         	   %>
                    <tr>
                       <td>Worker <%= count %></td>
-        		      <%<td><%= o.getValue().getInstanceID() %></td>
-        		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>%>
+        		      <td><%= o.getValue().getInstanceID() %></td>
+        		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
                    </tr>
         	   <% }
         }
