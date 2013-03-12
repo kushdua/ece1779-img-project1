@@ -14,6 +14,14 @@
 <%@page import="java.util.Vector" %>
 <%@page import="java.util.Date" %>
 
+<%@page import="javax.xml.parsers.DocumentBuilderFactory" %>
+<%@page import="javax.xml.parsers.DocumentBuilder" %>
+<%@page import="org.w3c.dom.Document" %>
+<%@page import="org.w3c.dom.NodeList" %>
+<%@page import="org.w3c.dom.Node" %>
+<%@page import="org.w3c.dom.Element" %>
+<%@page import="java.io.File" %>
+
 <html>
 <head>
 <title>Manage Workers</title>
@@ -51,6 +59,32 @@
 		return;
 	}
 %>
+
+<%
+		String defaultPoolSize = null;
+		String savedPoolSize = null;
+		
+		try {
+			File fXmlFile = new File("/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			
+			//getting root element
+			NodeList nl = doc.getDocumentElement().getChildNodes();
+			Element root = doc.getDocumentElement();
+			 defaultPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
+			 savedPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
+			 
+			 if (savedPoolSize.isEmpty() ) {
+			 	savedPoolSize = defaultPoolSize;
+			 }
+			
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+ %>
 
 <%@ include file="header.jsp" %>
 
@@ -93,11 +127,12 @@ try {
         	%> 
         	   <% for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
         		   
-        	   { %>
+        	   { 
+        	   %>
                    <tr>
                       <td>Worker <%= count %></td>
-        		      <td><%= o.getValue().getInstanceID() %></td>
-        		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
+        		      <%<td><%= o.getValue().getInstanceID() %></td>
+        		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>%>
                    </tr>
         	   <% }
         }
@@ -116,7 +151,7 @@ try {
 			 <div id="collapseManualSet" class="accordion-body collapse">
 				<div class="accordion-inner">
 					<form class="form-welcome">
-						<input type="text" name="manualPoolSizeValue" class="input-block-level" value="2">
+						<input type="text" name="manualPoolSizeValue" class="input-block-level" value=<%=savedPoolSize %>>
 					  <button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>
