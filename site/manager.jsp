@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@page import="org.apache.tomcat.jni.Library"%>
 <%@page import="java.util.Map"%>
-<%@page import="ece1779.servlets.LoadBalancerLibrary.WorkerRecord"%>
+<%@page import="ece1779.ec2.WorkerRecord"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="ece1779.servlets.LoadBalancerLibrary"%>
 <%@page import="com.amazonaws.AmazonClientException" %>
@@ -13,14 +13,6 @@
 <%@page import="java.util.List" %>
 <%@page import="java.util.Vector" %>
 <%@page import="java.util.Date" %>
-
-<%@page import="javax.xml.parsers.DocumentBuilderFactory" %>
-<%@page import="javax.xml.parsers.DocumentBuilder" %>
-<%@page import="org.w3c.dom.Document" %>
-<%@page import="org.w3c.dom.NodeList" %>
-<%@page import="org.w3c.dom.Node" %>
-<%@page import="org.w3c.dom.Element" %>
-<%@page import="java.io.File" %>
 
 <html>
 <head>
@@ -61,30 +53,8 @@
 %>
 
 <%
-		String defaultPoolSize = null;
-		String savedPoolSize = null;
-		
-		try {
-			File fXmlFile = new File("/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
-			
-			//getting root element
-			NodeList nl = doc.getDocumentElement().getChildNodes();
-			Element root = doc.getDocumentElement();
-			 defaultPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
-			 savedPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
-			 
-			 if (savedPoolSize.isEmpty() ) {
-			 	savedPoolSize = defaultPoolSize;
-			 }
-			
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
- %>
+   LoadBalancerLibrary.getInstance().loadConfigParameters();		
+%>
 
 <%@ include file="header.jsp" %>
 
@@ -128,13 +98,16 @@ try {
         	   <% for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
         		   
         	   { 
+        		    if(o.getValue().isActive())
+        		    {
         	   %>
                    <tr>
                       <td>Worker <%= count %></td>
         		      <td><%= o.getValue().getInstanceID() %></td>
         		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
                    </tr>
-        	   <% }
+        	   <%   }
+        	   }
         }
 } catch (AmazonServiceException ase) { } catch (AmazonClientException ace) { }
 %>
@@ -151,7 +124,7 @@ try {
 			 <div id="collapseManualSet" class="accordion-body collapse">
 				<div class="accordion-inner">
 					<form class="form-welcome">
-						<input type="text" name="manualPoolSizeValue" class="input-block-level" value=<%=savedPoolSize %>>
+						<input type="text" name="manualPoolSizeValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getSavedPoolSize() %>>
 					  <button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>

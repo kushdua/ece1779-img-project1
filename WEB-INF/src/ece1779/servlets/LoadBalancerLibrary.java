@@ -39,6 +39,15 @@ import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
 
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import java.io.File;
+
 import ece1779.ec2.WorkerRecord;
 
 public class LoadBalancerLibrary {
@@ -50,7 +59,8 @@ public class LoadBalancerLibrary {
 	String currentInstanceID = "";
 	//Manager params from web.xml
 	String managerInstanceID = "";
-	String manualWorkerSetSize = "2";
+	String defaultWorkerPoolSize = "2";
+	String manualWorkerPoolSize = "2";
 	String cpuThresholdGrowing = "20.0";
 	String cpuThresholdShrinking = "5.0";
 	String ratioExpandPool = "2";
@@ -174,6 +184,34 @@ public class LoadBalancerLibrary {
 				avgLoad = (double)(totalLoad / workerCount);
 			}
 		}
+    }
+    
+    public void loadConfigParameters()
+    {
+		try {
+			File fXmlFile = new File("/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			
+			//getting root element
+			NodeList nl = doc.getDocumentElement().getChildNodes();
+			Element root = doc.getDocumentElement();
+			 defaultWorkerPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
+			 manualWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
+			 
+			 if (manualWorkerPoolSize.isEmpty() ) {
+			 	manualWorkerPoolSize = defaultWorkerPoolSize;
+			 }
+			
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    }
+    
+    public String getSavedPoolSize()
+    {
+    	return manualWorkerPoolSize;
     }
 	
 	/**
