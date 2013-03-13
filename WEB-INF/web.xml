@@ -127,6 +127,16 @@
         <servlet-name>InstanceMetrics</servlet-name>
         <url-pattern>/servlet/InstanceMetrics</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+    	<servlet-name>WorkerPool</servlet-name>
+    	<servlet-class>ece1779.ec2.WorkerPool</servlet-class>
+  	</servlet>
+
+    <servlet-mapping>
+        <servlet-name>WorkerPool</servlet-name>
+        <url-pattern>/servlet/WorkerPool</url-pattern>
+    </servlet-mapping>
 
     <!-- Specify what is protected and who is allowed access. -->
 <!--    <security-role>
