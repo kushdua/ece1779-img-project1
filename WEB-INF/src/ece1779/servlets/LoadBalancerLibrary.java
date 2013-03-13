@@ -42,6 +42,11 @@ import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLo
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -65,6 +70,7 @@ public class LoadBalancerLibrary {
 	String cpuThresholdShrinking = "5.0";
 	String ratioExpandPool = "2";
 	String ratioShrinkPool = "2";
+	String configFilePath = "/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml";
 	
 	public LoadBalancerLibrary()
 	{
@@ -189,7 +195,7 @@ public class LoadBalancerLibrary {
     public void loadConfigParameters()
     {
 		try {
-			File fXmlFile = new File("/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml");
+			File fXmlFile = new File(configFilePath);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
@@ -212,6 +218,42 @@ public class LoadBalancerLibrary {
     public String getSavedPoolSize()
     {
     	return manualWorkerPoolSize;
+    }
+    
+    public void setManualWorkerPoolSize(String enteredPoolsize)
+    {
+
+		//saving the ManualWorkerPoolSize to file
+				
+		try {
+			
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(configFilePath);
+						
+			//getting root element
+			Element root = doc.getDocumentElement();
+			
+			//String enteredPoolsize = request.getParameter("manualPoolSizeValue");
+			
+
+			Node SavedWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0);
+			SavedWorkerPoolSize.setTextContent(enteredPoolsize);
+								
+			//write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(configFilePath));
+			transformer.transform(source, result);
+			
+			//response.setContentType("text/html");
+        	//response.sendRedirect(request.getRequestURI());
+        	//response.sendRedirect("/testProject2/NewFile.jsp");
+			
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
     }
 	
 	/**

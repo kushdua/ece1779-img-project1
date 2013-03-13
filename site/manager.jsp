@@ -123,9 +123,9 @@ try {
 			</div>
 			 <div id="collapseManualSet" class="accordion-body collapse">
 				<div class="accordion-inner">
-					<form class="form-welcome">
+					<form class="form-welcome" action="/ece1779-img-project1/servlet/WorkerPool" method="post">
 						<input type="text" name="manualPoolSizeValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getSavedPoolSize() %>>
-					  <button class="btn btn-large btn-primary" type="submit">Submit</button>
+					  <button class="btn btn-large btn-primary" name="manualPoolSizeBtn" type="submit">Submit</button>
 					</form>
 				</div>
 			</div>
