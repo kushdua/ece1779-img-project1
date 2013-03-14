@@ -209,8 +209,7 @@ public class LoadBalancerLibrary {
 				avgLoad = (double)(totalLoad / workerCount);
 			}
 			
-			//TODO Start instances from inactive first; then create new...
-			//TODO Start timer to see when newly start instances can be added to LB worker pool and can be synced with LB contents in AWS
+			//TODO call increase/decrease worker methods as appropriate
 			
 			lastBalance = System.currentTimeMillis();
 		}
@@ -366,6 +365,19 @@ public class LoadBalancerLibrary {
 	 * @param newSize
 	 * @param credentials
 	 */
+	private void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
+	{
+		//TODO Figure out which instances to stop based off cpu load.
+		//TODO Remove from LB right away
+		//TODO Set timer to see when can be safely stopped (and call stop)
+		//TODO Move to inactive list once stopped and if none remain (some variable indicating how many requested to stop) cancel timer.
+	}
+	
+	/**
+	 * Increase pool size to new value using servletContext credentials saved by EC2 Initialization class.
+	 * @param newSize
+	 * @param credentials
+	 */
 	private void increaseWorkerPoolSize(int newSize, AWSCredentials credentials)
 	{
 		AmazonElasticLoadBalancingClient elb = new AmazonElasticLoadBalancingClient(credentials);
@@ -393,7 +405,13 @@ public class LoadBalancerLibrary {
         }
 		
 		//TODO mark some workers as inactive so requests don't get forwarded to them... mark as active if need to reactivate in the future
+        
+        //TODO start workers (first from inactive which ARE COMPLETELY STOPPED TO BEGIN WITH)
+        //TODO start timer to see when fully started
+        //TODO add to LB once fully started
+        
 		//register the instances to the balancer
+        
         RegisterInstancesWithLoadBalancerRequest register =new RegisterInstancesWithLoadBalancerRequest();
         register.setLoadBalancerName("loader");
         register.setInstances((Collection)instanceId);
