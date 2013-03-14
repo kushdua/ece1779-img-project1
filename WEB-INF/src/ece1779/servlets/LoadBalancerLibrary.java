@@ -210,6 +210,7 @@ public class LoadBalancerLibrary {
 			}
 			
 			//TODO Start instances from inactive first; then create new...
+			//TODO Start timer to see when newly start instances can be added to LB worker pool and can be synced with LB contents in AWS
 			
 			lastBalance = System.currentTimeMillis();
 		}
@@ -225,7 +226,7 @@ public class LoadBalancerLibrary {
 		
     	try {
         	HttpClient httpclient = new DefaultHttpClient();
-        	HttpGet httpget = new HttpGet("http://" + managerInstanceIP + "/servlet/LoadBalance");
+        	HttpGet httpget = new HttpGet("http://" + managerInstanceIP + ":8080/servlet/LoadBalance");
 			HttpResponse response = httpclient.execute(httpget);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -253,6 +254,7 @@ public class LoadBalancerLibrary {
 			cpuThresholdShrinking = root.getElementsByTagName("CpuThresholdShrinking").item(0).getTextContent();
 			ratioExpandPool = root.getElementsByTagName("RatioExpandPool").item(0).getTextContent();
 			ratioShrinkPool = root.getElementsByTagName("RatioShrinkPool").item(0).getTextContent();
+			poolResizeDelay = root.getElementsByTagName("PoolResizeDelay").item(0).getTextContent();
 
 			if (manualWorkerPoolSize.isEmpty() ) {
 				manualWorkerPoolSize = defaultWorkerPoolSize;
