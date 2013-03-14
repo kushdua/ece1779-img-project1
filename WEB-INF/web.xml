@@ -130,7 +130,7 @@
     
     <servlet>
     	<servlet-name>WorkerPool</servlet-name>
-    	<servlet-class>ece1779.ec2.WorkerPool</servlet-class>
+    	<servlet-class>ece1779.servlets.WorkerPool</servlet-class>
   	</servlet>
 
     <servlet-mapping>

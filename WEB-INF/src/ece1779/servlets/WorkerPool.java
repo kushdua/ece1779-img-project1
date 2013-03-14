@@ -1,4 +1,4 @@
-package ece1779.ec2;
+package ece1779.servlets;
 
 import java.io.IOException;
 
