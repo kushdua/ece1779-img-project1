@@ -88,6 +88,15 @@
         <url-pattern>/servlet/Authenticate</url-pattern>
     </servlet-mapping>
 
+   <servlet>
+        <servlet-name>LoadBalance</servlet-name>
+        <servlet-class>ece1779.servlets.LoadBalance</servlet-class>
+   </servlet> 
+    
+    <servlet-mapping>
+        <servlet-name>LoadBalance</servlet-name>
+        <url-pattern>/servlet/LoadBalance</url-pattern>
+    </servlet-mapping>
 <!--    <servlet>
         <servlet-name>LoadBalance</servlet-name>
         <servlet-class>ece1779.servlets.LoadBalance</servlet-class>

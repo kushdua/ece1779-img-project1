@@ -24,8 +24,9 @@ public class Threshold extends HttpServlet {
 				String cpuThresholdShrinking = request.getParameter("cpuThresholdShrinkValue");
 				String ratioExpandPool = request.getParameter("ratioExpandPoolValue");
 				String ratioShrinkPool = request.getParameter("ratioShrinkPoolValue");
+				String poolResizeDelay = request.getParameter("poolResizeDelay");
 				
-				LoadBalancerLibrary.getInstance().setThresholdsAndRatios(cpuThresholdGrowing,cpuThresholdShrinking,ratioExpandPool,ratioShrinkPool);
+				LoadBalancerLibrary.getInstance().setThresholdsAndRatios(cpuThresholdGrowing,cpuThresholdShrinking,ratioExpandPool,ratioShrinkPool, poolResizeDelay);
 				
 				response.setContentType("text/html");
 	        	//response.sendRedirect(request.getRequestURI());

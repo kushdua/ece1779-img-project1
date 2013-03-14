@@ -143,6 +143,7 @@ try {
 						<h3>CPU threshold for shrinking worker pool: </h3><input type="text" name="cpuThresholdShrinkValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getCpuThresholdShrinking() %>>
 						<h3>Ratio by which to expand worker pool (2 = doubles): </h3><input type="text" name="ratioExpandPoolValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getRatioExpandPool() %>>
 						<h3>Ratio by which to shrink worker pool (4 = 75% off): </h3><input type="text" name="ratioShrinkPoolValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getRatioShrinkPool() %>>
+                        <h3>Delay between worker pool size adjustments (s): </h3><input type="text" name="poolResizeDelay" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getPoolResizeDelay() %>>
 					  	<button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>

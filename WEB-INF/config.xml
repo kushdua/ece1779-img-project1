@@ -5,4 +5,5 @@
 	<CpuThresholdShrinking>5</CpuThresholdShrinking>
 	<RatioExpandPool>2</RatioExpandPool>
 	<RatioShrinkPool>4</RatioShrinkPool>
+	<PoolResizeDelay>10</PoolResizeDelay>
 </configs>

@@ -1,6 +1,7 @@
 package ece1779.servlets;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -39,7 +40,6 @@ import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
 
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -47,6 +47,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -71,6 +76,10 @@ public class LoadBalancerLibrary {
 	String ratioExpandPool = "2";
 	String ratioShrinkPool = "2";
 	String configFilePath = "/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml";
+	String poolResizeDelay = "10";
+	private String managerInstanceIP;
+	
+	private static long lastBalance = 0l;
 	
 	public LoadBalancerLibrary()
 	{
@@ -172,7 +181,17 @@ public class LoadBalancerLibrary {
 		managerInstanceID = servletContext.getInitParameter("managerInstanceID");
 		
 		currentInstanceID = retrieveInstanceId();
-		if(currentInstanceID.compareTo(managerInstanceID) == 0)
+		
+		int resizeDelay = 0;
+		try
+		{
+			resizeDelay = Integer.parseInt(poolResizeDelay);
+		}
+		catch(NumberFormatException e){
+			resizeDelay = 10;
+		}
+		
+		if(currentInstanceID.compareTo(managerInstanceID) == 0 && System.currentTimeMillis() - lastBalance > (resizeDelay*1000))
 		{
 			//Load balance if need be
 			updateWorkerStats(servletContext);
@@ -189,6 +208,31 @@ public class LoadBalancerLibrary {
 			{
 				avgLoad = (double)(totalLoad / workerCount);
 			}
+			
+			//TODO Start instances from inactive first; then create new...
+			
+			lastBalance = System.currentTimeMillis();
+		}
+    }
+    
+    public void clientInvokeCoordLoadBalance(ServletContext servletContext)
+    {
+		managerInstanceIP = servletContext.getInitParameter("managerInstanceIP");
+		if(managerInstanceIP == null || managerInstanceIP.length() == 0)
+		{
+			managerInstanceIP = "54.235.69.246";
+		}
+		
+    	try {
+        	HttpClient httpclient = new DefaultHttpClient();
+        	HttpGet httpget = new HttpGet("http://" + managerInstanceIP + "/servlet/LoadBalance");
+			HttpResponse response = httpclient.execute(httpget);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
     
@@ -199,24 +243,24 @@ public class LoadBalancerLibrary {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
-			
+
 			//getting root element
 			NodeList nl = doc.getDocumentElement().getChildNodes();
 			Element root = doc.getDocumentElement();
-			 defaultWorkerPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
-			 manualWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
-			 cpuThresholdGrowing = root.getElementsByTagName("CpuThresholdGrowing").item(0).getTextContent();
-			 cpuThresholdShrinking = root.getElementsByTagName("CpuThresholdShrinking").item(0).getTextContent();
-			 ratioExpandPool = root.getElementsByTagName("RatioExpandPool").item(0).getTextContent();
-			 ratioShrinkPool = root.getElementsByTagName("RatioShrinkPool").item(0).getTextContent();
-			 
-			 if (manualWorkerPoolSize.isEmpty() ) {
-			 	manualWorkerPoolSize = defaultWorkerPoolSize;
-			 }
-			
-			} catch (Exception e) {
-				e.printStackTrace();
+			defaultWorkerPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
+			manualWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
+			cpuThresholdGrowing = root.getElementsByTagName("CpuThresholdGrowing").item(0).getTextContent();
+			cpuThresholdShrinking = root.getElementsByTagName("CpuThresholdShrinking").item(0).getTextContent();
+			ratioExpandPool = root.getElementsByTagName("RatioExpandPool").item(0).getTextContent();
+			ratioShrinkPool = root.getElementsByTagName("RatioShrinkPool").item(0).getTextContent();
+
+			if (manualWorkerPoolSize.isEmpty() ) {
+				manualWorkerPoolSize = defaultWorkerPoolSize;
 			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
     public String getSavedPoolSize()
@@ -242,6 +286,11 @@ public class LoadBalancerLibrary {
     public String getRatioShrinkPool()
     {
     	return ratioShrinkPool;
+    }
+    
+    public String getPoolResizeDelay()
+    {
+    	return poolResizeDelay ;
     }
     
     public void setManualWorkerPoolSize(String enteredPoolsize)
@@ -277,36 +326,36 @@ public class LoadBalancerLibrary {
 
 	public void setThresholdsAndRatios(String cpuThresholdGrowing2,
 			String cpuThresholdShrinking2, String ratioExpandPool2,
-			String ratioShrinkPool2) {
-				
-		//saving to config file
-		
-				try {
-					
-					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-					Document doc = docBuilder.parse(configFilePath);
-								
-					//getting root element
-					Element root = doc.getDocumentElement();
+			String ratioShrinkPool2, String poolResizeDelay) {
 
-					root.getElementsByTagName("CpuThresholdGrowing").item(0).setTextContent(cpuThresholdGrowing2);
-					root.getElementsByTagName("CpuThresholdShrinking").item(0).setTextContent(cpuThresholdShrinking2);
-					root.getElementsByTagName("RatioExpandPool").item(0).setTextContent(ratioExpandPool2);
-					root.getElementsByTagName("RatioShrinkPool").item(0).setTextContent(ratioShrinkPool2);
-					
-										
-					//write the content into xml file
-					TransformerFactory transformerFactory = TransformerFactory.newInstance();
-					Transformer transformer = transformerFactory.newTransformer();
-					DOMSource source = new DOMSource(doc);
-					StreamResult result = new StreamResult(new File(configFilePath));
-					transformer.transform(source, result);
-					
-					
-					} catch (Exception e) {
-						e.printStackTrace();
-					} 
+		//saving to config file
+
+		try {
+
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(configFilePath);
+
+			//getting root element
+			Element root = doc.getDocumentElement();
+
+			root.getElementsByTagName("CpuThresholdGrowing").item(0).setTextContent(cpuThresholdGrowing2);
+			root.getElementsByTagName("CpuThresholdShrinking").item(0).setTextContent(cpuThresholdShrinking2);
+			root.getElementsByTagName("RatioExpandPool").item(0).setTextContent(ratioExpandPool2);
+			root.getElementsByTagName("RatioShrinkPool").item(0).setTextContent(ratioShrinkPool2);
+			root.getElementsByTagName("PoolResizeDelay").item(0).setTextContent(poolResizeDelay);
+
+			//write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(configFilePath));
+			transformer.transform(source, result);
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
 		
 	}
 	

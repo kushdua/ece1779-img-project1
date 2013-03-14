@@ -31,12 +31,16 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
+import ece1779.servlets.LoadBalancerLibrary;
+
 
 public class FileUploadStatic extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws IOException, ServletException {
         try {
 
+        	LoadBalancerLibrary.getInstance().clientInvokeCoordLoadBalance();
+        	
         	// Create a factory for disk-based file items
         	FileItemFactory factory = new DiskFileItemFactory();
 
