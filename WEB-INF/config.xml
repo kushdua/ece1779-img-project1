@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configs>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><configs>
 	<DefaultWorkerPoolSize>4</DefaultWorkerPoolSize>
 	<SavedWorkerPoolSize>2</SavedWorkerPoolSize>
+	<CpuThresholdGrowing>20</CpuThresholdGrowing>
+	<CpuThresholdShrinking>5</CpuThresholdShrinking>
+	<RatioExpandPool>2</RatioExpandPool>
+	<RatioShrinkPool>4</RatioShrinkPool>
 </configs>

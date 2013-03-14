@@ -138,11 +138,11 @@ try {
 			</div>
 			 <div id="collapseAutoScale" class="accordion-body collapse">
 				<div class="accordion-inner">
-					<form class="form-welcome">
-						<h2>CPU threshold for growing worker pool: </h2><input type="text" name="cpuThresholdGrowValue" class="input-block-level" value="2">
-						<h3>CPU threshold for shrinking worker pool: </h2><input type="text" name="cpuThresholdShrinkValue" class="input-block-level" value="2">
-						<h3>Ratio by which to expand worker pool (2 = doubles): </h2><input type="text" name="ratioExpandPoolValue" class="input-block-level" value="2">
-						<h3>Ratio by which to shrink worker pool (4 = 75% off): </h2><input type="text" name="ratioShrinkPoolValue" class="input-block-level" value="2">
+					<form class="form-welcome" action="/ece1779-img-project1/servlet/Threshold" method="post">
+						<h3>CPU threshold for growing worker pool: </h3><input type="text" name="cpuThresholdGrowValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getCpuThresholdGrowing() %>>
+						<h3>CPU threshold for shrinking worker pool: </h3><input type="text" name="cpuThresholdShrinkValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getCpuThresholdShrinking() %>>
+						<h3>Ratio by which to expand worker pool (2 = doubles): </h3><input type="text" name="ratioExpandPoolValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getRatioExpandPool() %>>
+						<h3>Ratio by which to shrink worker pool (4 = 75% off): </h3><input type="text" name="ratioShrinkPoolValue" class="input-block-level" value=<%= LoadBalancerLibrary.getInstance().getRatioShrinkPool() %>>
 					  	<button class="btn btn-large btn-primary" type="submit">Submit</button>
 					</form>
 				</div>

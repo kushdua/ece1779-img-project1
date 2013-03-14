@@ -137,6 +137,16 @@
         <servlet-name>WorkerPool</servlet-name>
         <url-pattern>/servlet/WorkerPool</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+    	<servlet-name>Threshold</servlet-name>
+    	<servlet-class>ece1779.servlets.Threshold</servlet-class>
+  	</servlet>
+
+    <servlet-mapping>
+        <servlet-name>Threshold</servlet-name>
+        <url-pattern>/servlet/Threshold</url-pattern>
+    </servlet-mapping>
 
     <!-- Specify what is protected and who is allowed access. -->
 <!--    <security-role>

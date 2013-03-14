@@ -205,6 +205,10 @@ public class LoadBalancerLibrary {
 			Element root = doc.getDocumentElement();
 			 defaultWorkerPoolSize = root.getElementsByTagName("DefaultWorkerPoolSize").item(0).getTextContent(); 
 			 manualWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0).getTextContent();
+			 cpuThresholdGrowing = root.getElementsByTagName("CpuThresholdGrowing").item(0).getTextContent();
+			 cpuThresholdShrinking = root.getElementsByTagName("CpuThresholdShrinking").item(0).getTextContent();
+			 ratioExpandPool = root.getElementsByTagName("RatioExpandPool").item(0).getTextContent();
+			 ratioShrinkPool = root.getElementsByTagName("RatioShrinkPool").item(0).getTextContent();
 			 
 			 if (manualWorkerPoolSize.isEmpty() ) {
 			 	manualWorkerPoolSize = defaultWorkerPoolSize;
@@ -220,6 +224,26 @@ public class LoadBalancerLibrary {
     	return manualWorkerPoolSize;
     }
     
+    public String getCpuThresholdGrowing()
+    {
+    	return cpuThresholdGrowing;
+    }
+    
+    public String getCpuThresholdShrinking()
+    {
+    	return cpuThresholdShrinking;
+    }
+    
+    public String getRatioExpandPool()
+    {
+    	return ratioExpandPool;
+    }
+    
+    public String getRatioShrinkPool()
+    {
+    	return ratioShrinkPool;
+    }
+    
     public void setManualWorkerPoolSize(String enteredPoolsize)
     {
 
@@ -233,9 +257,6 @@ public class LoadBalancerLibrary {
 						
 			//getting root element
 			Element root = doc.getDocumentElement();
-			
-			//String enteredPoolsize = request.getParameter("manualPoolSizeValue");
-			
 
 			Node SavedWorkerPoolSize = root.getElementsByTagName("SavedWorkerPoolSize").item(0);
 			SavedWorkerPoolSize.setTextContent(enteredPoolsize);
@@ -247,14 +268,47 @@ public class LoadBalancerLibrary {
 			StreamResult result = new StreamResult(new File(configFilePath));
 			transformer.transform(source, result);
 			
-			//response.setContentType("text/html");
-        	//response.sendRedirect(request.getRequestURI());
-        	//response.sendRedirect("/testProject2/NewFile.jsp");
 			
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
     }
+    
+
+	public void setThresholdsAndRatios(String cpuThresholdGrowing2,
+			String cpuThresholdShrinking2, String ratioExpandPool2,
+			String ratioShrinkPool2) {
+				
+		//saving to config file
+		
+				try {
+					
+					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+					Document doc = docBuilder.parse(configFilePath);
+								
+					//getting root element
+					Element root = doc.getDocumentElement();
+
+					root.getElementsByTagName("CpuThresholdGrowing").item(0).setTextContent(cpuThresholdGrowing2);
+					root.getElementsByTagName("CpuThresholdShrinking").item(0).setTextContent(cpuThresholdShrinking2);
+					root.getElementsByTagName("RatioExpandPool").item(0).setTextContent(ratioExpandPool2);
+					root.getElementsByTagName("RatioShrinkPool").item(0).setTextContent(ratioShrinkPool2);
+					
+										
+					//write the content into xml file
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+					StreamResult result = new StreamResult(new File(configFilePath));
+					transformer.transform(source, result);
+					
+					
+					} catch (Exception e) {
+						e.printStackTrace();
+					} 
+		
+	}
 	
 	/**
 	 * Increase pool size to new value using servletContext credentials saved by EC2 Initialization class.
@@ -294,4 +348,5 @@ public class LoadBalancerLibrary {
         register.setInstances((Collection)instanceId);
         RegisterInstancesWithLoadBalancerResult registerWithLoadBalancerResult= elb.registerInstancesWithLoadBalancer(register);
 	}
+
 }
