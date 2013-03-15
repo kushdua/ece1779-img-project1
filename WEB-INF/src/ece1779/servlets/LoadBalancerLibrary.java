@@ -359,7 +359,8 @@ public class LoadBalancerLibrary {
 				}
 			}
 			
-			//See if there's any logical rebalancing to be done by removing entries from inactive pool that have been reactivated
+			//See if there's any logical rebalancing to be done by removing entries from inactive pool
+			//that have been reactivated when we updated status of workers
 			for(String key : recordsToRemoveFromInactive)
 			{
 				inactiveWorkerPool.remove(key);
@@ -418,7 +419,7 @@ public class LoadBalancerLibrary {
 				avgLoad = (double)(totalLoad / workerCount);
 			}
 			
-			//TODO call increase/decrease worker methods as appropriate
+			//call increase/decrease worker methods as appropriate
 			int cpuThresholdGrowing = 50;
 			int cpuThresholdShrinking = 5;
 			int ratioExpand = 2;
@@ -708,7 +709,7 @@ public class LoadBalancerLibrary {
 	        StartInstancesRequest startInstanceRequest = null;
 	        ArrayList<String> startRequestListInstances = new ArrayList<String>();
 	        
-	        //TODO start workers (first from inactive which ARE COMPLETELY STOPPED TO BEGIN WITH)
+	        //start workers (first from inactive which ARE COMPLETELY STOPPED TO BEGIN WITH)
 	        for(String inactiveInstanceID : inactiveWorkerPool.keySet())
 	        {
 	        	WorkerRecord worker = inactiveWorkerPool.get(inactiveInstanceID);

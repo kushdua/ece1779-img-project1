@@ -19,7 +19,7 @@
 <div class="container">
   
   <form class="form-welcome" action="/ece1779-img-project1/servlet/Authenticate<% 
-  if(request.getParameter("redirect")!=null) { request.setAttribute("redirect",request.getParameter("redirect")); } %>" method="post">
+  if(request != null && request.getParameter("redirect")!=null) { request.setAttribute("redirect",request.getParameter("redirect")); } %>" method="post">
 			<h2 class="form-welcome-heading">Please sign in</h2>
 			<div class="row">
 				<input type="text" name="userNameText"
