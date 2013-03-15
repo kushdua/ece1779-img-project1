@@ -281,7 +281,8 @@ public class LoadBalancerLibrary {
     {
 		managerInstanceID = servletContext.getInitParameter("managerInstanceID");
 		
-		currentInstanceID = retrieveInstanceId();
+		//This is only invoked on manager; can hardcode in case retrieve returns incorrect values
+		currentInstanceID = managerInstanceID; //retrieveInstanceId();
 		
 		int resizeDelay = 0;
 		try
