@@ -461,7 +461,7 @@ public class LoadBalancerLibrary {
 			{
 				increaseWorkerPoolSize(currPoolSize * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
-			else if((int)avgLoad < cpuThresholdShrinking)
+			else if((int)avgLoad < cpuThresholdShrinking && (currPoolSize / ratioShrink) > 2)
 			{
 				decreaseWorkerPoolSize(currPoolSize / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
