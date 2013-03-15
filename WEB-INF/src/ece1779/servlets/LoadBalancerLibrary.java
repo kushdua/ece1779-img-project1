@@ -457,11 +457,11 @@ public class LoadBalancerLibrary {
 				ratioShrink = 2;
 			}
 			
-			if(avgLoad > cpuThresholdGrowing)
+			if((int)avgLoad > cpuThresholdGrowing)
 			{
 				increaseWorkerPoolSize(currPoolSize * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
-			else if(avgLoad < cpuThresholdShrinking)
+			else if((int)avgLoad < cpuThresholdShrinking)
 			{
 				decreaseWorkerPoolSize(currPoolSize / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
