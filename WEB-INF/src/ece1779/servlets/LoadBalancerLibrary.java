@@ -281,8 +281,7 @@ public class LoadBalancerLibrary {
     {
 		managerInstanceID = servletContext.getInitParameter("managerInstanceID");
 		
-		//currentInstanceID = retrieveInstanceId();
-		currentInstanceID = managerInstanceID;
+		currentInstanceID = retrieveInstanceId();
 		
 		int resizeDelay = 0;
 		try
@@ -477,7 +476,7 @@ public class LoadBalancerLibrary {
 		
     	try {
         	HttpClient httpclient = new DefaultHttpClient();
-        	HttpGet httpget = new HttpGet("http://" + managerInstanceIP + ":8080/servlet/LoadBalance");
+        	HttpGet httpget = new HttpGet("http://" + managerInstanceIP + ":8080/ece1779-img-project1/servlet/LoadBalance");
 			HttpResponse response = httpclient.execute(httpget);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
@@ -726,7 +725,8 @@ public class LoadBalancerLibrary {
 	        for(String inactiveInstanceID : inactiveWorkerPool.keySet())
 	        {
 	        	WorkerRecord worker = inactiveWorkerPool.get(inactiveInstanceID);
-	        	if(worker.isStopped() && !startRequestListInstances.contains(inactiveInstanceID) && numToStart > 0)
+	        	if(worker.isStopped() && !startRequestListInstances.contains(inactiveInstanceID) && numToStart > 0 &&
+	        	   !workerPool.containsKey(inactiveInstanceID))
 	        	{
 	        		startRequestListInstances.add(inactiveInstanceID);
 	        		numToStart--;
