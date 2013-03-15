@@ -295,7 +295,7 @@ public class LoadBalancerLibrary {
 	        ArrayList<Instance> instanceIDs = new ArrayList<Instance>();
 			for(Entry<String, WorkerRecord> w : startupWorkerPool.entrySet())
 			{
-				if(w.getValue().isActive() && !instanceIDs.contains(w.getKey()))
+				if(workerPool.containsKey(w.getValue().getInstanceID()) && !instanceIDs.contains(w.getKey()))
 				{
 					Instance instance = new Instance(w.getKey());
 					instanceIDs.add(instance);
@@ -345,12 +345,24 @@ public class LoadBalancerLibrary {
 			
 		//See if need to stop any inactive instances if configurable shutdown time threshold passed
 	        ArrayList<String> stopRequestListInstances = new ArrayList<String>();
+	        ArrayList<String> recordsToRemoveFromInactive = new ArrayList<String>();
 			for(WorkerRecord w : inactiveWorkerPool.values())
 			{
-				if(System.currentTimeMillis() - w.getLastInactivated() > resizeDelay)
+				if(System.currentTimeMillis() - w.getLastInactivated() > resizeDelay && !workerPool.containsKey(w.getInstanceID()))
 				{
 					stopRequestListInstances.add(w.getInstanceID());
 				}
+				else if(workerPool.containsKey(w.getInstanceID()))
+				{
+					//inactiveWorkerPool.remove(w.getInstanceID());
+					recordsToRemoveFromInactive.add(w.getInstanceID());
+				}
+			}
+			
+			//See if there's any logical rebalancing to be done by removing entries from inactive pool that have been reactivated
+			for(String key : recordsToRemoveFromInactive)
+			{
+				inactiveWorkerPool.remove(key);
 			}
 			
 			StopInstancesRequest stopInstanceRequest = null;
@@ -617,15 +629,22 @@ public class LoadBalancerLibrary {
 		
 		//Remove freshly deactivated instances from active pool (and possibly others that are still not fully stopped)
         ArrayList<Instance> deregisterInstanceIDs = new ArrayList<Instance>();
+        HashMap<String, WorkerRecord> recordToRemove = new HashMap<String, WorkerRecord>();
 		for(String inactiveInstanceKey : deactivatedInstances)
 		{
 			if(workerPool.containsKey(inactiveInstanceKey))
 			{
-				workerPool.remove(inactiveInstanceKey);
+				//workerPool.remove(inactiveInstanceKey);
+				recordToRemove.put(inactiveInstanceKey, workerPool.get(inactiveInstanceKey));
 				deregisterInstanceIDs.add(new Instance(inactiveInstanceKey));
 			}
 		}
 		
+		//Remove instances we just inactivated from active worker pool
+		for(WorkerRecord w : workerPool.values())
+		{
+			workerPool.remove(w.getInstanceID());
+		}
 		
 		//Remove deactivated instances from LB
 		try
