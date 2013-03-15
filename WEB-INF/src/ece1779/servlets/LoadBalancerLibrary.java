@@ -137,25 +137,25 @@ public class LoadBalancerLibrary {
     public void updateWorkerStats(ServletContext servletContext)
     {
     	managerInstanceID = servletContext.getInitParameter("managerInstanceID");
-    	if(!workerPool.containsKey(managerInstanceID))
-    	{
-    		WorkerRecord newRecord = new WorkerRecord();
-    		newRecord.setActive(true);
-    		newRecord.setStopped(false);
-    		newRecord.setLastInactivated(0);
-    		newRecord.setInstanceID(managerInstanceID);
-    		workerPool.put(managerInstanceID, newRecord);
-    	}
-
-    	if(!workerPool.containsKey(defaultWorkerInstanceID))
-    	{
-    		WorkerRecord newRecord = new WorkerRecord();
-    		newRecord.setActive(true);
-    		newRecord.setStopped(false);
-    		newRecord.setLastInactivated(0);
-    		newRecord.setInstanceID(defaultWorkerInstanceID);
-    		workerPool.put(defaultWorkerInstanceID, newRecord);
-    	}
+//    	if(!workerPool.containsKey(managerInstanceID))
+//    	{
+//    		WorkerRecord newRecord = new WorkerRecord();
+//    		newRecord.setActive(true);
+//    		newRecord.setStopped(false);
+//    		newRecord.setLastInactivated(0);
+//    		newRecord.setInstanceID(managerInstanceID);
+//    		workerPool.put(managerInstanceID, newRecord);
+//    	}
+//
+//    	if(!workerPool.containsKey(defaultWorkerInstanceID))
+//    	{
+//    		WorkerRecord newRecord = new WorkerRecord();
+//    		newRecord.setActive(true);
+//    		newRecord.setStopped(false);
+//    		newRecord.setLastInactivated(0);
+//    		newRecord.setInstanceID(defaultWorkerInstanceID);
+//    		workerPool.put(defaultWorkerInstanceID, newRecord);
+//    	}
     	
     	BasicAWSCredentials awsCredentials = (BasicAWSCredentials)servletContext.getAttribute("AWSCredentials");
 
@@ -171,6 +171,7 @@ public class LoadBalancerLibrary {
     	    java.util.List<Metric>  metrics = result.getMetrics();
 
 	        boolean resetWorkerPoolHashmap = false;
+	        int foundOnlineRecords = 0;
     	    for (Metric metric : metrics) {
     	        String namespace = metric.getNamespace();
     	        String metricName = metric.getMetricName();
@@ -190,19 +191,20 @@ public class LoadBalancerLibrary {
     	        statistics.add("Maximum");
     	        statisticsRequest.setStatistics(statistics);
     	        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
-
+    	        
     	        if(stats.getDatapoints().size()>0)
     	        {
+    	        	foundOnlineRecords++;
     	        	WorkerRecord newWorker = new WorkerRecord();
     	        	if(dimensions.size() > 0 && dimensions.get(0).getName().toString().compareTo("InstanceId")==0)
     	        	{
     	        		String instanceId = dimensions.get(0).getValue().toString();
 
     	        		//Only update if we know about this Instance somehow (started/stopped it)
-    	        		if(workerPool.containsKey(instanceId)
-    	        				|| inactiveWorkerPool.containsKey(instanceId)
-    	        				|| startupWorkerPool.containsKey(instanceId))
-    	        		{
+//    	        		if(workerPool.containsKey(instanceId)
+//    	        				|| inactiveWorkerPool.containsKey(instanceId)
+//    	        				|| startupWorkerPool.containsKey(instanceId))
+//    	        		{
     	        			//Skip inserting array of predefined skipped instances into (active) worker pool
     	        			//Manager instance is inserted so its load can be displayed in manager UI
     	        			boolean skipInsert = false;
@@ -254,10 +256,17 @@ public class LoadBalancerLibrary {
     	        					//No state returned for instance; perhaps it is terminated or not otherwise active => ignore
     	        				}
     	        			}
-    	        		}
+//    	        		}
     	        	}
     	        }
     	    }
+    	    
+//    	    if(foundOnlineRecords==0)
+//    	    {
+//    	    	//Remove default Worker and Manager elements (which are assumed to be started always)
+//    	    	workerPool.remove(managerInstanceID);
+//    	    	workerPool.remove(defaultWorkerInstanceID);
+//    	    }
 
         } catch (AmazonServiceException ase) {
         	ase.printStackTrace();
@@ -750,6 +759,7 @@ public class LoadBalancerLibrary {
 	        		    .withImageId(workerAMIid)
 	        		    .withMinCount(1)
 	        		    .withMaxCount(1)
+	        		    .withMonitoring(true)
 	        		    .withSecurityGroupIds("ece1779Project1")
 	        		    .withKeyName("BozhidarKey");
 
