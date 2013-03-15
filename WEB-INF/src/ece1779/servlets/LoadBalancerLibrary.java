@@ -79,7 +79,7 @@ public class LoadBalancerLibrary {
 	int currPoolSize = 0; //number of active workers
 	int inactivePoolSize = 0; //number of inactive workers
 	
-	private static final String workerAMIid = "ami-c669f7af"; //"ami-394add50";
+	private static final String workerAMIid = "ami-dc039db5"; //"ami-394add50";
 
 	String currentInstanceID = "";
 	//Manager params from web.xml
@@ -95,7 +95,7 @@ public class LoadBalancerLibrary {
 	private String managerInstanceIP;
 	
 	private String[] skippedInstances = {"i-6a4df319", "i-8e99d9fd"};
-	private String loadBalancerName;
+	private String loadBalancerName = "ECE1779Project1Group1";
 	
 	private static long lastBalance = 0l;
 	
@@ -548,13 +548,7 @@ public class LoadBalancerLibrary {
 	 * @param credentials
 	 */
 	private void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
-	{
-		//TODO Figure out which instances to stop based off cpu load.
-		//TODO mark some workers as inactive so requests don't get forwarded to them... mark as active if need to reactivate in the future
-		//TODO Remove from LB right away
-		//TODO Set timer to see when can be safely stopped (and call stop)
-		//TODO Move to inactive list once stopped and if none remain (some variable indicating how many requested to stop) cancel timer.
-		
+	{	
 		WorkerRecord worker = new WorkerRecord();
 		ArrayList<String> deactivatedInstances = new ArrayList<String>();
 		for(String instanceKey : workerPool.keySet())
