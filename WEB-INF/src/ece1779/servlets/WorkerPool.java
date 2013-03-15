@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.amazonaws.auth.AWSCredentials;
+
 import ece1779.servlets.LoadBalancerLibrary;
 
 public class WorkerPool extends HttpServlet {
@@ -23,7 +25,22 @@ public class WorkerPool extends HttpServlet {
 							
 				String enteredPoolsize = request.getParameter("manualPoolSizeValue");
 				
-				LoadBalancerLibrary.getInstance().setManualWorkerPoolSize(enteredPoolsize);
+				try
+				{
+					int intEnteredPoolSize = Integer.parseInt(enteredPoolsize);
+					LoadBalancerLibrary.getInstance().setManualWorkerPoolSize(enteredPoolsize);
+					LoadBalancerLibrary.getInstance().increaseWorkerPoolSize(intEnteredPoolSize, (AWSCredentials)getServletContext().getAttribute("AWSCredentials"));
+				}
+				catch(NumberFormatException e)
+				{
+					request.setAttribute("errorMessage", "Invalid integer argument provided: " + enteredPoolsize);
+				}
+				catch(Exception e)
+				{
+					request.setAttribute("errorMessage", "Unable to save manual pool size to file.");
+				}
+				
+				request.setAttribute("successMessage", "Successfully updated worker pool size to " + enteredPoolsize + ". Please wait while the instances are started");
 				
 				response.setContentType("text/html");
 	        	//response.sendRedirect(request.getRequestURI());

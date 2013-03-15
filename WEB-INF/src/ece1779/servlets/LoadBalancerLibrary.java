@@ -147,6 +147,7 @@ public class LoadBalancerLibrary {
     	    ListMetricsResult result = cw.listMetrics(listMetricsRequest);
     	    java.util.List<Metric>  metrics = result.getMetrics();
 
+	        boolean resetWorkerPoolHashmap = false;
     	    for (Metric metric : metrics) {
     	        String namespace = metric.getNamespace();
     	        String metricName = metric.getMetricName();
@@ -167,13 +168,12 @@ public class LoadBalancerLibrary {
     	        statisticsRequest.setStatistics(statistics);
     	        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
     	        
-    	        boolean resetWorkerPoolHashmap = false;
     	        if(stats.getDatapoints().size()>0)
     	        {
     	        	WorkerRecord newWorker = new WorkerRecord();
     	        	if(dimensions.size() > 0 && dimensions.get(0).getName().toString().compareTo("InstanceId")==0)
     	        	{
-    	        		String instanceId = dimensions.get(0).getName().toString();
+    	        		String instanceId = dimensions.get(0).getValue().toString();
     	        		
     	        		//Skip inserting array of predefined skipped instances into (active) worker pool
     	        		//Manager instance is inserted so its load can be displayed in manager UI
@@ -228,7 +228,14 @@ public class LoadBalancerLibrary {
     	        	}
     	        }
     	    }
-    	} catch (AmazonServiceException ase) { } catch (AmazonClientException ace) { }
+
+        } catch (AmazonServiceException ase) {
+        	ase.printStackTrace();
+        	//Nothing to print
+        } catch (AmazonClientException ace) {
+        	ace.printStackTrace();
+        	//Nothing to print
+        }
     }
     
     public void loadBalance(ServletContext servletContext) throws Exception
@@ -296,9 +303,12 @@ public class LoadBalancerLibrary {
 			        		}
 			        	}
 			        }
+
 		        } catch (AmazonServiceException ase) {
+		        	ase.printStackTrace();
 		        	//Nothing to print
 		        } catch (AmazonClientException ace) {
+		        	ace.printStackTrace();
 		        	//Nothing to print
 		        }
 			}
@@ -341,9 +351,12 @@ public class LoadBalancerLibrary {
 		        		}
 		        	}
 		        }
+
 	        } catch (AmazonServiceException ase) {
+	        	ase.printStackTrace();
 	        	//Nothing to print
 	        } catch (AmazonClientException ace) {
+	        	ace.printStackTrace();
 	        	//Nothing to print
 	        }
 			
@@ -480,8 +493,10 @@ public class LoadBalancerLibrary {
     public void setManualWorkerPoolSize(String enteredPoolsize)
     {
 
-		//saving the ManualWorkerPoolSize to file
-				
+		//saving the ManualWorkerPoolSize to file and update in memory
+    	
+    	manualWorkerPoolSize = enteredPoolsize;
+    	
 		try {
 			
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -500,9 +515,8 @@ public class LoadBalancerLibrary {
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new File(configFilePath));
 			transformer.transform(source, result);
-			
-			
-			} catch (Exception e) {
+
+		} catch (Exception e) {
 				e.printStackTrace();
 			} 
     }
@@ -548,7 +562,7 @@ public class LoadBalancerLibrary {
 	 * @param newSize
 	 * @param credentials
 	 */
-	private void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
+	public void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
 	{	
 		WorkerRecord worker = new WorkerRecord();
 		ArrayList<String> deactivatedInstances = new ArrayList<String>();
@@ -583,7 +597,6 @@ public class LoadBalancerLibrary {
 		}
 		
 		
-		
 		//Remove deactivated instances from LB
 		try
 		{
@@ -596,9 +609,12 @@ public class LoadBalancerLibrary {
 	        {
 	        	//Nothing to do - already marked instance as stopped locally and tried to remove from LB :)
 	        }
+
         } catch (AmazonServiceException ase) {
+        	ase.printStackTrace();
         	//Nothing to print
         } catch (AmazonClientException ace) {
+        	ace.printStackTrace();
         	//Nothing to print
         }
 	}
@@ -608,7 +624,7 @@ public class LoadBalancerLibrary {
 	 * @param newSize
 	 * @param credentials
 	 */
-	private void increaseWorkerPoolSize(int newSize, AWSCredentials credentials)
+	public void increaseWorkerPoolSize(int newSize, AWSCredentials credentials)
 	{
 		//+1 because of manager being there...
 		int numToStart = newSize - workerPool.size() + 1;
@@ -653,26 +669,40 @@ public class LoadBalancerLibrary {
 	        	}
 	        }
 	        
-	        try
+	        if(startRequestListInstances.size()>0)
 	        {
-	        	startInstanceRequest = new StartInstancesRequest(startRequestListInstances);
-	        	StartInstancesResult startResult = ec2.startInstances(startInstanceRequest);
-	        } catch (AmazonServiceException ase) {
-	        	//Nothing to print
-	        } catch (AmazonClientException ace) {
-	        	//Nothing to print
+	        	try
+	        	{
+	        		startInstanceRequest = new StartInstancesRequest(startRequestListInstances);
+	        		StartInstancesResult startResult = ec2.startInstances(startInstanceRequest);
+	        	} catch (AmazonServiceException ase) {
+	        		ase.printStackTrace();
+	        		//Nothing to print
+	        	} catch (AmazonClientException ace) {
+	        		ace.printStackTrace();
+	        		//Nothing to print
+	        	}
 	        }
 	        
-	        while(numToStart>0)
-	        {
+	        int numStarted=0;
+//	        while(numToStart-numStarted>0)
+//	        {
 	        	try
 		        {
 	        		for(int i=0; i<numToStart; i++)
 	        		{
-				    	RunInstancesRequest request = new RunInstancesRequest(workerAMIid,1,1);
-				    	request.setKeyName("ece1779-group1-instances-"+System.currentTimeMillis());
-				    	request.setInstanceType(InstanceType.M1Small);
-				    	RunInstancesResult createResult = ec2.runInstances(request);
+//				    	RunInstancesRequest request = new RunInstancesRequest(workerAMIid,1,1);
+//				    	request.setKeyName("ece1779-group1-instances-"+System.currentTimeMillis());
+//				    	request.setInstanceType(InstanceType.M1Small);
+	        			RunInstancesRequest request = new RunInstancesRequest()
+	        		    .withInstanceType(InstanceType.M1Small)
+	        		    .withImageId(workerAMIid)
+	        		    .withMinCount(1)
+	        		    .withMaxCount(1)
+	        		    .withSecurityGroupIds("ece1779Project1")
+	        		    .withKeyName("BozhidarKey");
+
+	        			RunInstancesResult createResult = ec2.runInstances(request);
 				    	if(createResult.getReservation().getInstances().size() > 0)
 				    	{
 				    		com.amazonaws.services.ec2.model.Instance instance = createResult.getReservation().getInstances().get(0);
@@ -683,14 +713,17 @@ public class LoadBalancerLibrary {
 				    		newWorker.setInstanceID(instance.getInstanceId());
 				    		newWorker.setLastInactivated(0);
 				    		startupWorkerPool.put(instance.getInstanceId(), newWorker);
+				    		numStarted++;
 				    	}
 	        		}
 		        } catch (AmazonServiceException ase) {
+		        	ase.printStackTrace();
 		        	//Nothing to print
 		        } catch (AmazonClientException ace) {
+		        	ace.printStackTrace();
 		        	//Nothing to print
 		        }
-	        }
+//	        }
         }
 	}
 
