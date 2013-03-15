@@ -628,6 +628,7 @@ public class LoadBalancerLibrary {
 	{
 		//+1 because of manager being there...
 		int numToStart = newSize - workerPool.size() + 1;
+		numToStart = (numToStart >=20) ? 20 : numToStart;
 		
 		AmazonElasticLoadBalancingClient elb = new AmazonElasticLoadBalancingClient(credentials);
 		AmazonEC2Client ec2 = new AmazonEC2Client(credentials);
