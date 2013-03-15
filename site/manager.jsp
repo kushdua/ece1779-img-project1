@@ -73,7 +73,7 @@
 				    	<tr>
 				    		<th>Worker</th>
 				    		<th>Instance ID</th>
-				    		<th>CPU Load (Percent)</th>
+				    		<th>Max CPU Load in last 2 minutes (Percent)</th>
 				    	</tr>
 				    	
 <%
