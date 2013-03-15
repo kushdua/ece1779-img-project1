@@ -33,6 +33,7 @@ public class Initialization extends HttpServlet {
 		    ds.setPassword(dbPassword);
 		    
 		    SharedPoolDataSource dbcp = new SharedPoolDataSource();
+		    dbcp.setMaxActive(-1);
 		    dbcp.setConnectionPoolDataSource(ds);
 
 		    config.getServletContext().setAttribute("dbpool",dbcp);
