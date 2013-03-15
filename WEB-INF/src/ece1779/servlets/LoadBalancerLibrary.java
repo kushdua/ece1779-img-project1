@@ -182,8 +182,8 @@ public class LoadBalancerLibrary {
     	        statisticsRequest.setDimensions(dimensions);
     	        Date endTime = new Date();
     	        Date startTime = new Date();
-    	        startTime.setTime(endTime.getTime()-1200000);
-    	        //Get stats for last 20 minutes
+    	        startTime.setTime(endTime.getTime()-300000);
+    	        //Get stats for last 5 minutes
     	        statisticsRequest.setStartTime(startTime);
     	        statisticsRequest.setEndTime(endTime);
     	        statisticsRequest.setPeriod(60);
