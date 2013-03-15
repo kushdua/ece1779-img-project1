@@ -459,11 +459,11 @@ public class LoadBalancerLibrary {
 			
 			if((int)avgLoad > cpuThresholdGrowing)
 			{
-				increaseWorkerPoolSize(currPoolSize * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+				increaseWorkerPoolSize(Math.min(1, workerPool.size()-1) * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
-			else if((int)avgLoad < cpuThresholdShrinking && (currPoolSize / ratioShrink) > 2)
+			else if((int)avgLoad < cpuThresholdShrinking && (Math.min(1, workerPool.size()-1) / ratioShrink) > 2)
 			{
-				decreaseWorkerPoolSize(currPoolSize / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+				decreaseWorkerPoolSize(Math.min(1, workerPool.size()-1) / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
 			
 			//Update last check time for delay check as we don't want to poll stats info too often
