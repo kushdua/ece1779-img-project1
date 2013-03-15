@@ -92,14 +92,14 @@ try {
         
         if(workerPool.size() > 0)
         {
-        	//Stats available
-        	count++;
         	%> 
         	   <% String managerID = getServletContext().getInitParameter("managerInstanceID");
         	   for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
         	   { 
         		    if(o.getValue().isActive() && o.getValue().getInstanceID().compareTo(managerID)!=0)
         		    {
+        	            //Stats available for worker
+        	            count++;
         	   %>
                    <tr>
                       <td>Worker <%= count %></td>

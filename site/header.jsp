@@ -94,13 +94,15 @@
     </div>
 </div>
 
-<% if(request!=null && request.getSession()!=null && request.getSession().getAttribute("errorMessage")!=null) { %>
+<% if(request!=null && request.getSession()!=null && request.getSession().getAttribute("errorMessage")!=null &&
+      !request.getSession().getAttribute("errorMessage").toString().isEmpty()) { %>
 <div class="alert alert-error">  
   <a class="close" data-dismiss="alert">×</a>  
   <strong>Error: </strong> <%= request.getSession().getAttribute("errorMessage").toString() %> 
   <% request.getSession().removeAttribute("errorMessage"); %> 
 </div> 
-<% } else if(request!=null && request.getSession()!=null && request.getSession().getAttribute("successMessage")!=null) { %>
+<% } else if(request!=null && request.getSession()!=null && request.getSession().getAttribute("successMessage")!=null &&
+             !request.getSession().getAttribute("successMessage").toString().isEmpty()) { %>
 <div class="alert alert-success">  
   <a class="close" data-dismiss="alert">×</a>  
   <strong>Success: </strong> <%= request.getSession().getAttribute("successMessage").toString() %>  

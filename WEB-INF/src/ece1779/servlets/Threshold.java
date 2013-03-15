@@ -36,9 +36,9 @@ public class Threshold extends HttpServlet {
 					
 					String errorMessage = "";
 					
-					if(intCPUThresholdGrowing < 0 || intCPUThresholdGrowing > 200)
+					if(intCPUThresholdGrowing < 0 || intCPUThresholdGrowing > 1000)
 					{
-						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "CPU Grow Threshold must be between 0 and 200%. You provided: " + cpuThresholdGrowing;
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "CPU Grow Threshold must be between 0 and 1000%. You provided: " + cpuThresholdGrowing;
 					}
 					else
 					{
@@ -81,15 +81,25 @@ public class Threshold extends HttpServlet {
 						LoadBalancerLibrary.getInstance().poolResizeDelay = Integer.toString(intPoolResizeDelay);
 					}
 					
-					request.setAttribute("errorMessage", errorMessage);
+					if(!errorMessage.isEmpty())
+					{
+						request.getSession().setAttribute("errorMessage", errorMessage);
+					}
 				}
 				catch(NumberFormatException e)
 				{
-					request.setAttribute("errorMessage", "Invalid input provided.\nCPU grow threshold: " + cpuThresholdGrowing + 
+					request.getSession().setAttribute("errorMessage",
+							new String("Invalid input provided.\nCPU grow threshold: " + cpuThresholdGrowing + 
 							"\nCPU shrink threshold: " + cpuThresholdShrinking +
 							"\nRatio pool expand: " + ratioExpandPool + 
 							"\nRatio pool shrink: " + ratioShrinkPool + 
-							"\nPool resize delay: " + poolResizeDelay);
+							"\nPool resize delay: " + poolResizeDelay));
+				}
+				
+				if( request.getSession().getAttribute("errorMessage")==null ||
+					request.getSession().getAttribute("errorMessage").toString().isEmpty())
+				{
+					request.getSession().setAttribute("successMessage", "Successfully updated threshold auto LB values");
 				}
 				
 				LoadBalancerLibrary.getInstance().setThresholdsAndRatios(cpuThresholdGrowing,cpuThresholdShrinking,ratioExpandPool,ratioShrinkPool, poolResizeDelay);

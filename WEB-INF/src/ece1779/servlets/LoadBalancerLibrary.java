@@ -232,7 +232,7 @@ public class LoadBalancerLibrary {
     	        				DescribeInstanceStatusRequest describeInstanceRequest = new DescribeInstanceStatusRequest().withInstanceIds(newWorker.getInstanceID());
     	        				DescribeInstanceStatusResult describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
     	        				List<InstanceStatus> state = describeInstanceResult.getInstanceStatuses();
-    	        				if (state.size() > 1) { 
+    	        				if (state.size() > 0) { 
     	        					String status = state.get(0).getInstanceState().getName();
     	        					if(status.compareTo(InstanceStateName.Running.toString())==0)
     	        					{
@@ -281,7 +281,8 @@ public class LoadBalancerLibrary {
     {
 		managerInstanceID = servletContext.getInitParameter("managerInstanceID");
 		
-		currentInstanceID = retrieveInstanceId();
+		//currentInstanceID = retrieveInstanceId();
+		currentInstanceID = managerInstanceID;
 		
 		int resizeDelay = 0;
 		try
@@ -375,42 +376,45 @@ public class LoadBalancerLibrary {
 				inactiveWorkerPool.remove(key);
 			}
 			
-			StopInstancesRequest stopInstanceRequest = null;
-	        
-	        //stop workers from inactive list
-	        try
-	        {
-	    		AmazonEC2Client ec2 = new AmazonEC2Client((AWSCredentials)servletContext.getAttribute("AWSCredentials"));
-	        	stopInstanceRequest = new StopInstancesRequest(stopRequestListInstances);
-	        	StopInstancesResult stopResult = ec2.stopInstances(stopInstanceRequest);
-	        	if(stopResult.getStoppingInstances().size()>0)
+			if(stopRequestListInstances.size()>0)
+			{
+				StopInstancesRequest stopInstanceRequest = null;
+		        
+		        //stop workers from inactive list
+		        try
 		        {
-		        	List<InstanceStateChange> resultInstances = stopResult.getStoppingInstances();
-		        	for(String i : stopRequestListInstances)
-		        	{
-		        		for(InstanceStateChange lb : resultInstances)
-		        		{
-		        			if(i.compareTo(lb.getInstanceId())==0)
-		        			{
-		        				WorkerRecord stopped = inactiveWorkerPool.get(i);
-		        				if(stopped != null)
-		        				{
-		        					stopped.setStopped(true);
-		        					stopped.setLastInactivated(0);
-		        				}
-		        				break;
-		        			}
-		        		}
-		        	}
+		    		AmazonEC2Client ec2 = new AmazonEC2Client((AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+		        	stopInstanceRequest = new StopInstancesRequest(stopRequestListInstances);
+		        	StopInstancesResult stopResult = ec2.stopInstances(stopInstanceRequest);
+		        	if(stopResult.getStoppingInstances().size()>0)
+			        {
+			        	List<InstanceStateChange> resultInstances = stopResult.getStoppingInstances();
+			        	for(String i : stopRequestListInstances)
+			        	{
+			        		for(InstanceStateChange lb : resultInstances)
+			        		{
+			        			if(i.compareTo(lb.getInstanceId())==0)
+			        			{
+			        				WorkerRecord stopped = inactiveWorkerPool.get(i);
+			        				if(stopped != null)
+			        				{
+			        					stopped.setStopped(true);
+			        					stopped.setLastInactivated(0);
+			        				}
+			        				break;
+			        			}
+			        		}
+			        	}
+			        }
+	
+		        } catch (AmazonServiceException ase) {
+		        	ase.printStackTrace();
+		        	//Nothing to print
+		        } catch (AmazonClientException ace) {
+		        	ace.printStackTrace();
+		        	//Nothing to print
 		        }
-
-	        } catch (AmazonServiceException ase) {
-	        	ase.printStackTrace();
-	        	//Nothing to print
-	        } catch (AmazonClientException ace) {
-	        	ace.printStackTrace();
-	        	//Nothing to print
-	        }
+			}
 			
 		//See if need to increase/decrease pool size
 	        
@@ -764,7 +768,7 @@ public class LoadBalancerLibrary {
 	        		    .withKeyName("BozhidarKey");
 
 	        			RunInstancesResult createResult = ec2.runInstances(request);
-				    	if(createResult.getReservation().getInstances().size() > 0)
+				    	if(createResult.getReservation().getInstances().size() == 1)
 				    	{
 				    		com.amazonaws.services.ec2.model.Instance instance = createResult.getReservation().getInstances().get(0);
 				    		WorkerRecord newWorker = new WorkerRecord();
