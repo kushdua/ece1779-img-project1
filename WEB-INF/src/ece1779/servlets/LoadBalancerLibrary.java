@@ -304,8 +304,12 @@ public class LoadBalancerLibrary {
 	        ArrayList<Instance> instanceIDs = new ArrayList<Instance>();
 			for(Entry<String, WorkerRecord> w : startupWorkerPool.entrySet())
 			{
-				if(workerPool.containsKey(w.getValue().getInstanceID()) && !instanceIDs.contains(w.getKey()))
+				//Try to add to LB even if no statistics on instance - wait for minimum pool resize delay since starting it though
+//				if(workerPool.containsKey(w.getValue().getInstanceID()) && !instanceIDs.contains(w.getKey()))
+//				{
+				if(System.currentTimeMillis() - w.getValue().getLastStarted() > (resizeDelay*1000))
 				{
+					w.getValue().setLastStarted(System.currentTimeMillis());
 					Instance instance = new Instance(w.getKey());
 					instanceIDs.add(instance);
 				}
@@ -777,6 +781,7 @@ public class LoadBalancerLibrary {
 				    		newWorker.setCpuLoad(0.0);
 				    		newWorker.setInstanceID(instance.getInstanceId());
 				    		newWorker.setLastInactivated(0);
+				    		newWorker.setLastStarted(System.currentTimeMillis());
 				    		startupWorkerPool.put(instance.getInstanceId(), newWorker);
 				    		numStarted++;
 				    	}

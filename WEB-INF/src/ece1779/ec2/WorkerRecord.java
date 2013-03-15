@@ -7,6 +7,7 @@ public class WorkerRecord
 	private boolean isActive = false;
 	private boolean isStopped = false;
 	private long lastInactivated = 0l;
+	private long lastStarted = 0l;
 
 	public String getInstanceID() {
 		return instanceID;
@@ -46,5 +47,13 @@ public class WorkerRecord
 
 	public void setLastInactivated(long lastInactivated) {
 		this.lastInactivated = lastInactivated;
+	}
+
+	public long getLastStarted() {
+		return lastStarted;
+	}
+
+	public void setLastStarted(long lastStarted) {
+		this.lastStarted = lastStarted;
 	}
 }
