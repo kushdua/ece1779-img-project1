@@ -36,6 +36,7 @@ import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.InstanceStateChange;
 import com.amazonaws.services.ec2.model.InstanceStateName;
 import com.amazonaws.services.ec2.model.InstanceStatus;
+import com.amazonaws.services.ec2.model.InstanceType;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
@@ -670,6 +671,7 @@ public class LoadBalancerLibrary {
 	        		{
 				    	RunInstancesRequest request = new RunInstancesRequest(workerAMIid,1,1);
 				    	request.setKeyName("ece1779-group1-instances-"+System.currentTimeMillis());
+				    	request.setInstanceType(InstanceType.M1Small);
 				    	RunInstancesResult createResult = ec2.runInstances(request);
 				    	if(createResult.getReservation().getInstances().size() > 0)
 				    	{
