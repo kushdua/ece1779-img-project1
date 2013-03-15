@@ -100,6 +100,8 @@ public class LoadBalancerLibrary {
 	
 	private static long lastBalance = 0l;
 	
+	private final String defaultWorkerInstanceID = "ami-dc039db5";
+	
 	public LoadBalancerLibrary()
 	{
 	}
@@ -134,6 +136,27 @@ public class LoadBalancerLibrary {
     
     public void updateWorkerStats(ServletContext servletContext)
     {
+    	managerInstanceID = servletContext.getInitParameter("managerInstanceID");
+    	if(!workerPool.containsKey(managerInstanceID))
+    	{
+    		WorkerRecord newRecord = new WorkerRecord();
+    		newRecord.setActive(true);
+    		newRecord.setStopped(false);
+    		newRecord.setLastInactivated(0);
+    		newRecord.setInstanceID(managerInstanceID);
+    		workerPool.put(managerInstanceID, newRecord);
+    	}
+
+    	if(!workerPool.containsKey(defaultWorkerInstanceID))
+    	{
+    		WorkerRecord newRecord = new WorkerRecord();
+    		newRecord.setActive(true);
+    		newRecord.setStopped(false);
+    		newRecord.setLastInactivated(0);
+    		newRecord.setInstanceID(defaultWorkerInstanceID);
+    		workerPool.put(defaultWorkerInstanceID, newRecord);
+    	}
+    	
     	BasicAWSCredentials awsCredentials = (BasicAWSCredentials)servletContext.getAttribute("AWSCredentials");
 
     	AmazonCloudWatch cw = new AmazonCloudWatchClient(awsCredentials);
@@ -167,63 +190,70 @@ public class LoadBalancerLibrary {
     	        statistics.add("Maximum");
     	        statisticsRequest.setStatistics(statistics);
     	        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
-    	        
+
     	        if(stats.getDatapoints().size()>0)
     	        {
     	        	WorkerRecord newWorker = new WorkerRecord();
     	        	if(dimensions.size() > 0 && dimensions.get(0).getName().toString().compareTo("InstanceId")==0)
     	        	{
     	        		String instanceId = dimensions.get(0).getValue().toString();
-    	        		
-    	        		//Skip inserting array of predefined skipped instances into (active) worker pool
-    	        		//Manager instance is inserted so its load can be displayed in manager UI
-    	        		boolean skipInsert = false;
-    	        		
-    	        		for(int i=0; i<skippedInstances.length; i++)
+
+    	        		//Only update if we know about this Instance somehow (started/stopped it)
+    	        		if(workerPool.containsKey(instanceId)
+    	        				|| inactiveWorkerPool.containsKey(instanceId)
+    	        				|| startupWorkerPool.containsKey(instanceId))
     	        		{
-    	        			if(instanceId.compareTo(skippedInstances[i])==0)
+    	        			//Skip inserting array of predefined skipped instances into (active) worker pool
+    	        			//Manager instance is inserted so its load can be displayed in manager UI
+    	        			boolean skipInsert = false;
+
+    	        			for(int i=0; i<skippedInstances.length; i++)
     	        			{
-    	        				skipInsert=true;
-    	        				break;
+    	        				if(instanceId.compareTo(skippedInstances[i])==0)
+    	        				{
+    	        					skipInsert=true;
+    	        					break;
+    	        				}
     	        			}
-    	        		}
-    	        		
-    	        		if(!resetWorkerPoolHashmap)
-    	        		{
-    	        			workerPool.clear();
-    	        			resetWorkerPoolHashmap = true;
-    	        		}
-    	        		
-    	        		if(!skipInsert)
-    	        		{
-	    	        		newWorker.setInstanceID(instanceId);
-	    	        		newWorker.setCpuLoad(stats.getDatapoints().get(0).getMaximum());
-	    	        		
-	    	        		DescribeInstanceStatusRequest describeInstanceRequest = new DescribeInstanceStatusRequest().withInstanceIds(newWorker.getInstanceID());
-	    	        		DescribeInstanceStatusResult describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
-	    	        		List<InstanceStatus> state = describeInstanceResult.getInstanceStatuses();
-	    	        		while (state.size() < 1) { 
-	    	        		    // Do nothing, just wait, have thread sleep if needed
-	    	        		    describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
-	    	        		    state = describeInstanceResult.getInstanceStatuses();
-	    	        		}
-	    	        		String status = state.get(0).getInstanceState().getName();
-	    	        		if(status.compareTo(InstanceStateName.Running.toString())==0)
-	    	        		{
-	    	        			newWorker.setActive(true);
-	    	        			newWorker.setStopped(false);
-	    	        		}
-	    	        		else if(status.compareTo(InstanceStateName.Stopped.toString())==0)
-	    	        		{
-	    	        			newWorker.setActive(false);
-	    	        			newWorker.setStopped(true);
-	    	        		}
-	    	        		else
-	    	        		{
-	    	        			newWorker.setActive(false);
-	    	        			newWorker.setStopped(false);
-	    	        		}
-	        	        	workerPool.put(newWorker.getInstanceID(), newWorker);
+
+    	        			if(!resetWorkerPoolHashmap)
+    	        			{
+    	        				workerPool.clear();
+    	        				resetWorkerPoolHashmap = true;
+    	        			}
+
+    	        			if(!skipInsert)
+    	        			{
+    	        				newWorker.setInstanceID(instanceId);
+    	        				newWorker.setCpuLoad(stats.getDatapoints().get(0).getMaximum());
+
+    	        				DescribeInstanceStatusRequest describeInstanceRequest = new DescribeInstanceStatusRequest().withInstanceIds(newWorker.getInstanceID());
+    	        				DescribeInstanceStatusResult describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
+    	        				List<InstanceStatus> state = describeInstanceResult.getInstanceStatuses();
+    	        				if (state.size() > 1) { 
+    	        					String status = state.get(0).getInstanceState().getName();
+    	        					if(status.compareTo(InstanceStateName.Running.toString())==0)
+    	        					{
+    	        						newWorker.setActive(true);
+    	        						newWorker.setStopped(false);
+    	        					}
+    	        					else if(status.compareTo(InstanceStateName.Stopped.toString())==0)
+    	        					{
+    	        						newWorker.setActive(false);
+    	        						newWorker.setStopped(true);
+    	        					}
+    	        					else
+    	        					{
+    	        						newWorker.setActive(false);
+    	        						newWorker.setStopped(false);
+    	        					}
+    	        					workerPool.put(newWorker.getInstanceID(), newWorker);
+    	        				}
+    	        				else
+    	        				{
+    	        					//No state returned for instance; perhaps it is terminated or not otherwise active => ignore
+    	        				}
+    	        			}
     	        		}
     	        	}
     	        }

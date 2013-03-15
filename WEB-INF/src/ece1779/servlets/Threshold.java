@@ -34,26 +34,54 @@ public class Threshold extends HttpServlet {
 					int intRatioShrinkPool = Integer.parseInt(ratioShrinkPool);
 					int intPoolResizeDelay = Integer.parseInt(poolResizeDelay);
 					
+					String errorMessage = "";
+					
 					if(intCPUThresholdGrowing < 0 || intCPUThresholdGrowing > 200)
 					{
-						request.setAttribute("errorMessage", "CPU Grow Threshold must be between 0 and 200%. You provided: " + cpuThresholdGrowing);
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "CPU Grow Threshold must be between 0 and 200%. You provided: " + cpuThresholdGrowing;
 					}
-					else if(intCPUThresholdShrinking < 0 || intCPUThresholdShrinking > 200)
+					else
 					{
-						request.setAttribute("errorMessage", "CPU Shrink Threshold must be between 0 and 200%. You provided: " + cpuThresholdGrowing);
+						LoadBalancerLibrary.getInstance().cpuThresholdGrowing = Integer.toString(intCPUThresholdGrowing);
 					}
-					else if(intRatioExpandPool < 0 || intRatioExpandPool > 5)
+					
+					if(intCPUThresholdShrinking < 0 || intCPUThresholdShrinking > 200)
 					{
-						request.setAttribute("errorMessage", "Pool Expand ratio must be between 0 and 5. You provided: " + cpuThresholdGrowing);
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "CPU Shrink Threshold must be between 0 and 200%. You provided: " + cpuThresholdGrowing;
 					}
-					else if(intRatioShrinkPool < 0 || intRatioShrinkPool > 5)
+					else
 					{
-						request.setAttribute("errorMessage", "Pool Shrink ratio must be between 0 and 5. You provided: " + cpuThresholdGrowing);
+						LoadBalancerLibrary.getInstance().cpuThresholdShrinking = Integer.toString(intCPUThresholdShrinking);
 					}
-					else if(intPoolResizeDelay < 0 || intPoolResizeDelay > 120)
+					
+					if(intRatioExpandPool < 0 || intRatioExpandPool > 5)
 					{
-						request.setAttribute("errorMessage", "Pool Resize delay must be between 0 and 120 seconds. You provided: " + cpuThresholdGrowing);
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "Pool Expand ratio must be between 0 and 5. You provided: " + cpuThresholdGrowing;
 					}
+					else
+					{
+						LoadBalancerLibrary.getInstance().ratioExpandPool = Integer.toString(intRatioExpandPool);
+					}
+					
+					if(intRatioShrinkPool < 0 || intRatioShrinkPool > 5)
+					{
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "Pool Shrink ratio must be between 0 and 5. You provided: " + cpuThresholdGrowing;
+					}
+					else
+					{
+						LoadBalancerLibrary.getInstance().ratioShrinkPool = Integer.toString(intRatioShrinkPool);
+					}
+					
+					if(intPoolResizeDelay < 0 || intPoolResizeDelay > 120)
+					{
+						errorMessage += ((errorMessage.isEmpty()) ? "" : "\n") + "Pool Resize delay must be between 0 and 120 seconds. You provided: " + cpuThresholdGrowing;
+					}
+					else
+					{
+						LoadBalancerLibrary.getInstance().poolResizeDelay = Integer.toString(intPoolResizeDelay);
+					}
+					
+					request.setAttribute("errorMessage", errorMessage);
 				}
 				catch(NumberFormatException e)
 				{
