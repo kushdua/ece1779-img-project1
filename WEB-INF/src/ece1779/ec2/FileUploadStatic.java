@@ -134,8 +134,8 @@ public class FileUploadStatic extends HttpServlet {
             out.write("<html><head><title>Sample Image Upload</title></head>");
             out.write("<body>");
             
-            out.write("<img src='http://d4e4zv37grvr9.cloudfront.net/" + key1 + "' />");
-            out.write("<img src='http://d4e4zv37grvr9.cloudfront.net/" + key2 + "' />");
+//            out.write("<img src='http://d4e4zv37grvr9.cloudfront.net/" + key1 + "' />");
+//            out.write("<img src='http://d4e4zv37grvr9.cloudfront.net/" + key2 + "' />");
             
             out.write("</body></html>");
              
