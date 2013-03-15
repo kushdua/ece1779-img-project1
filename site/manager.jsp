@@ -95,10 +95,10 @@ try {
         	//Stats available
         	count++;
         	%> 
-        	   <% for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
-        		   
+        	   <% String managerID = getServletContext().getInitParameter("managerInstanceID");
+        	   for(Map.Entry<String, WorkerRecord> o : workerPool.entrySet())
         	   { 
-        		    if(o.getValue().isActive())
+        		    if(o.getValue().isActive() && o.getValue().getInstanceID().compareTo(managerID)!=0)
         		    {
         	   %>
                    <tr>
@@ -107,6 +107,15 @@ try {
         		      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
                    </tr>
         	   <%   }
+        		    else if(o.getValue().isActive() && o.getValue().getInstanceID().compareTo(managerID)==0)
+        		    {
+               %>
+                   <tr>
+                      <td>Manager</td>
+                      <td><%= o.getValue().getInstanceID() %></td>
+                      <td><%= Double.toString(o.getValue().getCpuLoad()) %></td>
+                   </tr>
+               <%   }
         	   }
         }
 } catch (AmazonServiceException ase) { } catch (AmazonClientException ace) { }

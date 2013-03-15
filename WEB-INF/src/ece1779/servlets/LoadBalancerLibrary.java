@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.servlet.ServletContext;
@@ -32,13 +33,23 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.InstanceStateChange;
 import com.amazonaws.services.ec2.model.InstanceStateName;
 import com.amazonaws.services.ec2.model.InstanceStatus;
 import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.StartInstancesRequest;
+import com.amazonaws.services.ec2.model.StartInstancesResult;
+import com.amazonaws.services.ec2.model.StopInstancesRequest;
+import com.amazonaws.services.ec2.model.StopInstancesResult;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
+import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerRequest;
+import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerResult;
 import com.amazonaws.services.elasticloadbalancing.model.Instance;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
 import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerResult;
+import com.amazonaws.services.elasticloadbalancing.model.transform.DeregisterInstancesFromLoadBalancerRequestMarshaller;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -63,21 +74,28 @@ import ece1779.ec2.WorkerRecord;
 public class LoadBalancerLibrary {
 	private static LoadBalancerLibrary instance = null;
 	private HashMap<String, WorkerRecord> workerPool = new HashMap<String, WorkerRecord>(); 
+	private HashMap<String, WorkerRecord> inactiveWorkerPool = new HashMap<String, WorkerRecord>();
+	private HashMap<String, WorkerRecord> startupWorkerPool = new HashMap<String, WorkerRecord>();
 	int currPoolSize = 0; //number of active workers
 	int inactivePoolSize = 0; //number of inactive workers
+	
+	private static final String workerAMIid = "ami-c669f7af"; //"ami-394add50";
 
 	String currentInstanceID = "";
 	//Manager params from web.xml
 	String managerInstanceID = "";
 	String defaultWorkerPoolSize = "2";
 	String manualWorkerPoolSize = "2";
-	String cpuThresholdGrowing = "20.0";
-	String cpuThresholdShrinking = "5.0";
+	String cpuThresholdGrowing = "50";
+	String cpuThresholdShrinking = "10";
 	String ratioExpandPool = "2";
 	String ratioShrinkPool = "2";
 	String configFilePath = "/var/lib/tomcat6/webapps/ece1779-img-project1/WEB-INF/config.xml";
-	String poolResizeDelay = "10";
+	String poolResizeDelay = "60";
 	private String managerInstanceIP;
+	
+	private String[] skippedInstances = {"i-6a4df319", "i-8e99d9fd"};
+	private String loadBalancerName;
 	
 	private static long lastBalance = 0l;
 	
@@ -148,28 +166,64 @@ public class LoadBalancerLibrary {
     	        statisticsRequest.setStatistics(statistics);
     	        GetMetricStatisticsResult stats = cw.getMetricStatistics(statisticsRequest);
     	        
-    	        if(stats.getDatapoints().size()>0  )
+    	        boolean resetWorkerPoolHashmap = false;
+    	        if(stats.getDatapoints().size()>0)
     	        {
     	        	WorkerRecord newWorker = new WorkerRecord();
     	        	if(dimensions.size() > 0 && dimensions.get(0).getName().toString().compareTo("InstanceId")==0)
     	        	{
-    	        		newWorker.setInstanceID(dimensions.get(0).getValue().toString());
-    	        		newWorker.setCpuLoad(stats.getDatapoints().get(0).getMaximum());
+    	        		String instanceId = dimensions.get(0).getName().toString();
     	        		
-    	        		DescribeInstanceStatusRequest describeInstanceRequest = new DescribeInstanceStatusRequest().withInstanceIds(newWorker.getInstanceID());
-    	        		DescribeInstanceStatusResult describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
-    	        		List<InstanceStatus> state = describeInstanceResult.getInstanceStatuses();
-    	        		while (state.size() < 1) { 
-    	        		    // Do nothing, just wait, have thread sleep if needed
-    	        		    describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
-    	        		    state = describeInstanceResult.getInstanceStatuses();
-    	        		}
-    	        		String status = state.get(0).getInstanceState().getName();
-    	        		if(status.compareTo(InstanceStateName.Running.toString())==0)
+    	        		//Skip inserting array of predefined skipped instances into (active) worker pool
+    	        		//Manager instance is inserted so its load can be displayed in manager UI
+    	        		boolean skipInsert = false;
+    	        		
+    	        		for(int i=0; i<skippedInstances.length; i++)
     	        		{
-    	        			newWorker.setActive(true);
+    	        			if(instanceId.compareTo(skippedInstances[i])==0)
+    	        			{
+    	        				skipInsert=true;
+    	        				break;
+    	        			}
     	        		}
-        	        	workerPool.put(newWorker.getInstanceID(), newWorker);
+    	        		
+    	        		if(!resetWorkerPoolHashmap)
+    	        		{
+    	        			workerPool.clear();
+    	        			resetWorkerPoolHashmap = true;
+    	        		}
+    	        		
+    	        		if(!skipInsert)
+    	        		{
+	    	        		newWorker.setInstanceID(instanceId);
+	    	        		newWorker.setCpuLoad(stats.getDatapoints().get(0).getMaximum());
+	    	        		
+	    	        		DescribeInstanceStatusRequest describeInstanceRequest = new DescribeInstanceStatusRequest().withInstanceIds(newWorker.getInstanceID());
+	    	        		DescribeInstanceStatusResult describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
+	    	        		List<InstanceStatus> state = describeInstanceResult.getInstanceStatuses();
+	    	        		while (state.size() < 1) { 
+	    	        		    // Do nothing, just wait, have thread sleep if needed
+	    	        		    describeInstanceResult = ec2.describeInstanceStatus(describeInstanceRequest);
+	    	        		    state = describeInstanceResult.getInstanceStatuses();
+	    	        		}
+	    	        		String status = state.get(0).getInstanceState().getName();
+	    	        		if(status.compareTo(InstanceStateName.Running.toString())==0)
+	    	        		{
+	    	        			newWorker.setActive(true);
+	    	        			newWorker.setStopped(false);
+	    	        		}
+	    	        		else if(status.compareTo(InstanceStateName.Stopped.toString())==0)
+	    	        		{
+	    	        			newWorker.setActive(false);
+	    	        			newWorker.setStopped(true);
+	    	        		}
+	    	        		else
+	    	        		{
+	    	        			newWorker.setActive(false);
+	    	        			newWorker.setStopped(false);
+	    	        		}
+	        	        	workerPool.put(newWorker.getInstanceID(), newWorker);
+    	        		}
     	        	}
     	        }
     	    }
@@ -191,10 +245,109 @@ public class LoadBalancerLibrary {
 			resizeDelay = 10;
 		}
 		
-		if(currentInstanceID.compareTo(managerInstanceID) == 0 && System.currentTimeMillis() - lastBalance > (resizeDelay*1000))
+		if(currentInstanceID.compareTo(managerInstanceID) == 0 &&
+		   System.currentTimeMillis() - lastBalance > (resizeDelay*1000))
 		{
 			//Load balance if need be
+			
+			//Update worker stats if necessary delay since last load balance has passed
 			updateWorkerStats(servletContext);
+
+		//See if any inactive instances need to be added to LB
+	        ArrayList<Instance> instanceIDs = new ArrayList<Instance>();
+			for(Entry<String, WorkerRecord> w : startupWorkerPool.entrySet())
+			{
+				if(w.getValue().isActive() && !instanceIDs.contains(w.getKey()))
+				{
+					Instance instance = new Instance(w.getKey());
+					instanceIDs.add(instance);
+				}
+			}
+
+			if(instanceIDs.size()>0)
+			{
+				try
+				{
+					AmazonElasticLoadBalancingClient elb = new AmazonElasticLoadBalancingClient((AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+			        RegisterInstancesWithLoadBalancerRequest register = new RegisterInstancesWithLoadBalancerRequest();
+			        register.setLoadBalancerName(loadBalancerName);
+			        register.setInstances(instanceIDs);
+			        RegisterInstancesWithLoadBalancerResult registerWithLoadBalancerResult = elb.registerInstancesWithLoadBalancer(register);
+			        if(registerWithLoadBalancerResult.getInstances().size()>0)
+			        {
+			        	List<Instance> resultInstances = registerWithLoadBalancerResult.getInstances();
+			        	for(Instance i : instanceIDs)
+			        	{
+			        		for(Instance lb : resultInstances)
+			        		{
+			        			if(i.getInstanceId().compareTo(lb.getInstanceId())==0)
+			        			{
+			        				WorkerRecord removed = startupWorkerPool.remove(i.getInstanceId());
+			        				if(removed != null)
+			        				{
+			        					removed.setActive(true);
+			        					removed.setStopped(false);
+			        					removed.setLastInactivated(0);
+			        					workerPool.put(removed.getInstanceID(), removed);
+			        				}
+			        				break;
+			        			}
+			        		}
+			        	}
+			        }
+		        } catch (AmazonServiceException ase) {
+		        	//Nothing to print
+		        } catch (AmazonClientException ace) {
+		        	//Nothing to print
+		        }
+			}
+			
+		//See if need to stop any inactive instances if configurable shutdown time threshold passed
+	        ArrayList<String> stopRequestListInstances = new ArrayList<String>();
+			for(WorkerRecord w : inactiveWorkerPool.values())
+			{
+				if(System.currentTimeMillis() - w.getLastInactivated() > resizeDelay)
+				{
+					stopRequestListInstances.add(w.getInstanceID());
+				}
+			}
+			
+			StopInstancesRequest stopInstanceRequest = null;
+	        
+	        //stop workers from inactive list
+	        try
+	        {
+	    		AmazonEC2Client ec2 = new AmazonEC2Client((AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+	        	stopInstanceRequest = new StopInstancesRequest(stopRequestListInstances);
+	        	StopInstancesResult stopResult = ec2.stopInstances(stopInstanceRequest);
+	        	if(stopResult.getStoppingInstances().size()>0)
+		        {
+		        	List<InstanceStateChange> resultInstances = stopResult.getStoppingInstances();
+		        	for(String i : stopRequestListInstances)
+		        	{
+		        		for(InstanceStateChange lb : resultInstances)
+		        		{
+		        			if(i.compareTo(lb.getInstanceId())==0)
+		        			{
+		        				WorkerRecord stopped = inactiveWorkerPool.get(i);
+		        				if(stopped != null)
+		        				{
+		        					stopped.setStopped(true);
+		        					stopped.setLastInactivated(0);
+		        				}
+		        				break;
+		        			}
+		        		}
+		        	}
+		        }
+	        } catch (AmazonServiceException ase) {
+	        	//Nothing to print
+	        } catch (AmazonClientException ace) {
+	        	//Nothing to print
+	        }
+			
+		//See if need to increase/decrease pool size
+	        
 			double totalLoad = 0.0d;
 			int workerCount = 0;
 			double avgLoad = 0.0d;
@@ -210,7 +363,36 @@ public class LoadBalancerLibrary {
 			}
 			
 			//TODO call increase/decrease worker methods as appropriate
+			int cpuThresholdGrowing = 50;
+			int cpuThresholdShrinking = 5;
+			int ratioExpand = 2;
+			int ratioShrink = 2;
+			try
+			{
+				cpuThresholdGrowing = Integer.parseInt(this.cpuThresholdGrowing);
+				cpuThresholdShrinking = Integer.parseInt(this.cpuThresholdShrinking);
+				ratioExpand = Integer.parseInt(this.ratioExpandPool);
+				ratioShrink = Integer.parseInt(this.ratioShrinkPool);
+				
+			}
+			catch(NumberFormatException e)
+			{
+				cpuThresholdGrowing = 50;
+				cpuThresholdShrinking = 10;
+				ratioExpand = 2;
+				ratioShrink = 2;
+			}
 			
+			if(avgLoad > cpuThresholdGrowing)
+			{
+				increaseWorkerPoolSize(currPoolSize * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+			}
+			else if(avgLoad < cpuThresholdShrinking)
+			{
+				decreaseWorkerPoolSize(currPoolSize / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+			}
+			
+			//Update last check time for delay check as we don't want to poll stats info too often
 			lastBalance = System.currentTimeMillis();
 		}
     }
@@ -368,9 +550,62 @@ public class LoadBalancerLibrary {
 	private void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
 	{
 		//TODO Figure out which instances to stop based off cpu load.
+		//TODO mark some workers as inactive so requests don't get forwarded to them... mark as active if need to reactivate in the future
 		//TODO Remove from LB right away
 		//TODO Set timer to see when can be safely stopped (and call stop)
 		//TODO Move to inactive list once stopped and if none remain (some variable indicating how many requested to stop) cancel timer.
+		
+		WorkerRecord worker = new WorkerRecord();
+		ArrayList<String> deactivatedInstances = new ArrayList<String>();
+		for(String instanceKey : workerPool.keySet())
+		{
+			if(workerPool.size() > newSize)
+			{
+				worker = workerPool.get(instanceKey);
+				if(worker != null)
+				{
+					if(worker.isActive())
+					{
+						worker.setActive(false);
+						worker.setStopped(false);
+						worker.setLastInactivated(System.currentTimeMillis());
+						deactivatedInstances.add(worker.getInstanceID());
+						inactiveWorkerPool.put(instanceKey, worker);
+					}
+				}
+			}
+		}
+		
+		//Remove freshly deactivated instances from active pool (and possibly others that are still not fully stopped)
+        ArrayList<Instance> deregisterInstanceIDs = new ArrayList<Instance>();
+		for(String inactiveInstanceKey : deactivatedInstances)
+		{
+			if(workerPool.containsKey(inactiveInstanceKey))
+			{
+				workerPool.remove(inactiveInstanceKey);
+				deregisterInstanceIDs.add(new Instance(inactiveInstanceKey));
+			}
+		}
+		
+		
+		
+		//Remove deactivated instances from LB
+		try
+		{
+			AmazonElasticLoadBalancingClient elb = new AmazonElasticLoadBalancingClient(credentials);
+	        DeregisterInstancesFromLoadBalancerRequest deregister = new DeregisterInstancesFromLoadBalancerRequest();
+	        deregister.setLoadBalancerName(loadBalancerName);
+	        deregister.setInstances(deregisterInstanceIDs);
+	        DeregisterInstancesFromLoadBalancerResult deregisterFromLoadBalancerResult = elb.deregisterInstancesFromLoadBalancer(deregister);
+	        if(deregisterFromLoadBalancerResult.getInstances().size()>0)
+	        {
+	        	//Nothing to do - already marked instance as stopped locally and tried to remove from LB :)
+	        }
+        } catch (AmazonServiceException ase) {
+        	//Nothing to print
+        } catch (AmazonClientException ace) {
+        	//Nothing to print
+        }
 	}
 	
 	/**
@@ -380,42 +615,87 @@ public class LoadBalancerLibrary {
 	 */
 	private void increaseWorkerPoolSize(int newSize, AWSCredentials credentials)
 	{
+		//+1 because of manager being there...
+		int numToStart = newSize - workerPool.size() + 1;
+		
 		AmazonElasticLoadBalancingClient elb = new AmazonElasticLoadBalancingClient(credentials);
 		AmazonEC2Client ec2 = new AmazonEC2Client(credentials);
+//		
+//		//get the running instances
+//        DescribeInstancesResult describeInstancesRequest = ec2.describeInstances();
+//        List<Reservation> reservations = describeInstancesRequest.getReservations();
+//        List<Instance> instances = new ArrayList<Instance>();
+//
+//        for (Reservation reservation : reservations) {
+//            instances.addAll((Collection)reservation.getInstances());
+//        }
+//		
+//        //get instance id's
+//        String id;
+//        List instanceId=new ArrayList();
+//        List instanceIdString=new ArrayList();
+//        Iterator<Instance> iterator=instances.iterator();
+//        while (iterator.hasNext())
+//        {
+//            id=iterator.next().getInstanceId();
+//            instanceId.add(new com.amazonaws.services.elasticloadbalancing.model.Instance(id));
+//            instanceIdString.add(id);
+//        }
 		
-		//get the running instances
-        DescribeInstancesResult describeInstancesRequest = ec2.describeInstances();
-        List<Reservation> reservations = describeInstancesRequest.getReservations();
-        List<Instance> instances = new ArrayList<Instance>();
-
-        for (Reservation reservation : reservations) {
-            instances.addAll((Collection)reservation.getInstances());
-        }
-		
-        //get instance id's
-        String id;
-        List instanceId=new ArrayList();
-        List instanceIdString=new ArrayList();
-        Iterator<Instance> iterator=instances.iterator();
-        while (iterator.hasNext())
+        if(numToStart>0)
         {
-            id=iterator.next().getInstanceId();
-            instanceId.add(new com.amazonaws.services.elasticloadbalancing.model.Instance(id));
-            instanceIdString.add(id);
+	        StartInstancesRequest startInstanceRequest = null;
+	        ArrayList<String> startRequestListInstances = new ArrayList<String>();
+	        
+	        //TODO start workers (first from inactive which ARE COMPLETELY STOPPED TO BEGIN WITH)
+	        for(String inactiveInstanceID : inactiveWorkerPool.keySet())
+	        {
+	        	WorkerRecord worker = inactiveWorkerPool.get(inactiveInstanceID);
+	        	if(worker.isStopped() && !startRequestListInstances.contains(inactiveInstanceID) && numToStart > 0)
+	        	{
+	        		startRequestListInstances.add(inactiveInstanceID);
+	        		numToStart--;
+	        	}
+	        }
+	        
+	        try
+	        {
+	        	startInstanceRequest = new StartInstancesRequest(startRequestListInstances);
+	        	StartInstancesResult startResult = ec2.startInstances(startInstanceRequest);
+	        } catch (AmazonServiceException ase) {
+	        	//Nothing to print
+	        } catch (AmazonClientException ace) {
+	        	//Nothing to print
+	        }
+	        
+	        while(numToStart>0)
+	        {
+	        	try
+		        {
+	        		for(int i=0; i<numToStart; i++)
+	        		{
+				    	RunInstancesRequest request = new RunInstancesRequest(workerAMIid,1,1);
+				    	request.setKeyName("ece1779-group1-instances-"+System.currentTimeMillis());
+				    	RunInstancesResult createResult = ec2.runInstances(request);
+				    	if(createResult.getReservation().getInstances().size() > 0)
+				    	{
+				    		com.amazonaws.services.ec2.model.Instance instance = createResult.getReservation().getInstances().get(0);
+				    		WorkerRecord newWorker = new WorkerRecord();
+				    		newWorker.setActive(false);
+				    		newWorker.setStopped(false);
+				    		newWorker.setCpuLoad(0.0);
+				    		newWorker.setInstanceID(instance.getInstanceId());
+				    		newWorker.setLastInactivated(0);
+				    		startupWorkerPool.put(instance.getInstanceId(), newWorker);
+				    	}
+	        		}
+		        } catch (AmazonServiceException ase) {
+		        	//Nothing to print
+		        } catch (AmazonClientException ace) {
+		        	//Nothing to print
+		        }
+	        }
         }
-		
-		//TODO mark some workers as inactive so requests don't get forwarded to them... mark as active if need to reactivate in the future
-        
-        //TODO start workers (first from inactive which ARE COMPLETELY STOPPED TO BEGIN WITH)
-        //TODO start timer to see when fully started
-        //TODO add to LB once fully started
-        
-		//register the instances to the balancer
-        
-        RegisterInstancesWithLoadBalancerRequest register =new RegisterInstancesWithLoadBalancerRequest();
-        register.setLoadBalancerName("loader");
-        register.setInstances((Collection)instanceId);
-        RegisterInstancesWithLoadBalancerResult registerWithLoadBalancerResult= elb.registerInstancesWithLoadBalancer(register);
 	}
 
 }

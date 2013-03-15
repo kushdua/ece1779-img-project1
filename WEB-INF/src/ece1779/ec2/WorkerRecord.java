@@ -4,7 +4,9 @@ public class WorkerRecord
 {
 	private String instanceID = "";
 	private double cpuLoad = 0.0d;
-	private boolean isActive = true;
+	private boolean isActive = false;
+	private boolean isStopped = false;
+	private long lastInactivated = 0l;
 
 	public String getInstanceID() {
 		return instanceID;
@@ -28,5 +30,21 @@ public class WorkerRecord
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public boolean isStopped() {
+		return isStopped;
+	}
+
+	public void setStopped(boolean isStopping) {
+		this.isStopped = isStopping;
+	}
+
+	public long getLastInactivated() {
+		return lastInactivated;
+	}
+
+	public void setLastInactivated(long lastInactivated) {
+		this.lastInactivated = lastInactivated;
 	}
 }

@@ -38,7 +38,12 @@ public class FileUpload extends HttpServlet {
 	throws IOException, ServletException {
         try {
         	
-        	LoadBalancerLibrary.getInstance().clientInvokeCoordLoadBalance();
+        	String currentInstanceID = LoadBalancerLibrary.getInstance().retrieveInstanceId();
+    		
+    		if(currentInstanceID.compareTo(getServletContext().getInitParameter("managerInstanceID")) != 0)
+    		{
+    			LoadBalancerLibrary.getInstance().clientInvokeCoordLoadBalance(getServletContext());
+    		}
 
         	// Create a factory for disk-based file items
         	FileItemFactory factory = new DiskFileItemFactory();

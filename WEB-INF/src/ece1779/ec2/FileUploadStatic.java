@@ -39,7 +39,12 @@ public class FileUploadStatic extends HttpServlet {
 	throws IOException, ServletException {
         try {
 
-        	LoadBalancerLibrary.getInstance().clientInvokeCoordLoadBalance();
+        	String currentInstanceID = LoadBalancerLibrary.getInstance().retrieveInstanceId();
+    		
+    		if(currentInstanceID.compareTo(getServletContext().getInitParameter("managerInstanceID")) != 0)
+    		{
+    			LoadBalancerLibrary.getInstance().clientInvokeCoordLoadBalance(getServletContext());
+    		}
         	
         	// Create a factory for disk-based file items
         	FileItemFactory factory = new DiskFileItemFactory();
@@ -119,7 +124,7 @@ public class FileUploadStatic extends HttpServlet {
         	s3SaveFile(file3, key3, request, response);
         	s3SaveFile(file4, key4, request, response);
             
-        	String username = (String)request.getSession().getAttribute("username");
+        	String username = request.getParameter("userID");
         	updateDatabase(key1, key2, key3, key4, username);
         	
         	response.setContentType("text/html");
