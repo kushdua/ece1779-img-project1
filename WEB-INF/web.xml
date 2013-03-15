@@ -109,7 +109,7 @@
     
    <servlet>
         <servlet-name>FileUploadStatic</servlet-name>
-        <servlet-class>ece1779.servlets.FileUploadStatic</servlet-class>
+        <servlet-class>ece1779.ec2.FileUploadStatic</servlet-class>
    </servlet> 
     
     <servlet-mapping>
