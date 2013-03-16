@@ -459,11 +459,11 @@ public class LoadBalancerLibrary {
 			
 			if((int)avgLoad > cpuThresholdGrowing)
 			{
-				increaseWorkerPoolSize(Math.min(1, workerPool.size()-1) * ratioExpand, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+				increaseWorkerPoolSize(Math.max(1, (workerPool.size()-1) * ratioExpand), (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
-			else if((int)avgLoad < cpuThresholdShrinking && (Math.min(1, workerPool.size()-1) / ratioShrink) > 2)
+			else if((int)avgLoad < cpuThresholdShrinking)
 			{
-				decreaseWorkerPoolSize(Math.min(1, workerPool.size()-1) / ratioShrink, (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
+				decreaseWorkerPoolSize(Math.max(2, (workerPool.size()-1) / ratioShrink), (AWSCredentials)servletContext.getAttribute("AWSCredentials"));
 			}
 			
 			//Update last check time for delay check as we don't want to poll stats info too often
@@ -619,11 +619,11 @@ public class LoadBalancerLibrary {
 	
 	/**
 	 * Increase pool size to new value using servletContext credentials saved by EC2 Initialization class.
-	 * @param newSize
+	 * @param newSize Number of total workers and manager in pool (not just workers)
 	 * @param credentials
 	 */
 	public void decreaseWorkerPoolSize(int newSize, AWSCredentials credentials)
-	{	
+	{
 		WorkerRecord worker = new WorkerRecord();
 		ArrayList<String> deactivatedInstances = new ArrayList<String>();
 		for(String instanceKey : workerPool.keySet())
@@ -633,7 +633,7 @@ public class LoadBalancerLibrary {
 				worker = workerPool.get(instanceKey);
 				if(worker != null)
 				{
-					if(worker.isActive())
+					if(worker.isActive() && worker.getInstanceID().compareTo(managerInstanceID)!=0)
 					{
 						worker.setActive(false);
 						worker.setStopped(false);
@@ -688,7 +688,7 @@ public class LoadBalancerLibrary {
 	
 	/**
 	 * Increase pool size to new value using servletContext credentials saved by EC2 Initialization class.
-	 * @param newSize
+	 * @param newSize Number of WORKERS to start (aside from started manager)
 	 * @param credentials
 	 */
 	public void increaseWorkerPoolSize(int newSize, AWSCredentials credentials)
