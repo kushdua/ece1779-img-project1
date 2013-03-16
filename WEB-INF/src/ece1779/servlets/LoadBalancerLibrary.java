@@ -74,9 +74,9 @@ import ece1779.ec2.WorkerRecord;
 
 public class LoadBalancerLibrary {
 	private static LoadBalancerLibrary instance = null;
-	private HashMap<String, WorkerRecord> workerPool = new HashMap<String, WorkerRecord>(); 
-	private HashMap<String, WorkerRecord> inactiveWorkerPool = new HashMap<String, WorkerRecord>();
-	private HashMap<String, WorkerRecord> startupWorkerPool = new HashMap<String, WorkerRecord>();
+	public HashMap<String, WorkerRecord> workerPool = new HashMap<String, WorkerRecord>(); 
+	public HashMap<String, WorkerRecord> inactiveWorkerPool = new HashMap<String, WorkerRecord>();
+	public HashMap<String, WorkerRecord> startupWorkerPool = new HashMap<String, WorkerRecord>();
 	int currPoolSize = 0; //number of active workers
 	int inactivePoolSize = 0; //number of inactive workers
 	

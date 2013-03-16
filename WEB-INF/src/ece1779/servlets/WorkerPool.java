@@ -29,7 +29,18 @@ public class WorkerPool extends HttpServlet {
 			{
 				int intEnteredPoolSize = Integer.parseInt(enteredPoolsize);
 				LoadBalancerLibrary.getInstance().setManualWorkerPoolSize(enteredPoolsize);
-				LoadBalancerLibrary.getInstance().increaseWorkerPoolSize(intEnteredPoolSize, (AWSCredentials)getServletContext().getAttribute("AWSCredentials"));
+				if(LoadBalancerLibrary.getInstance().workerPool.size() <= intEnteredPoolSize)
+				{
+					LoadBalancerLibrary.getInstance().increaseWorkerPoolSize(intEnteredPoolSize, (AWSCredentials)getServletContext().getAttribute("AWSCredentials"));
+				}
+				else if(intEnteredPoolSize>2)
+				{
+					LoadBalancerLibrary.getInstance().decreaseWorkerPoolSize(intEnteredPoolSize, (AWSCredentials)getServletContext().getAttribute("AWSCredentials"));	
+				}
+				else
+				{
+					request.getSession().setAttribute("errorMessage", "Please enter a larger worker pool size value");
+				}
 			}
 			catch(NumberFormatException e)
 			{
